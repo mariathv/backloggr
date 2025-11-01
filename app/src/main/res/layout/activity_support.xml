@@ -299,7 +299,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/expandmore"
+                            android:src="@drawable/ic_expand_more"
                             app:tint="#B0B0B0" />
                     </LinearLayout>
 
@@ -328,7 +328,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/expandmore"
+                            android:src="@drawable/ic_expand_more"
                             app:tint="#B0B0B0" />
                     </LinearLayout>
 
@@ -357,7 +357,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/expandmore"
+                            android:src="@drawable/ic_expand_more"
                             app:tint="#B0B0B0" />
                     </LinearLayout>
 
@@ -386,7 +386,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/expandmore"
+                            android:src="@drawable/ic_expand_more"
                             app:tint="#B0B0B0" />
                     </LinearLayout>
                     <!-- FAQ Item -->
@@ -409,7 +409,7 @@
                         <ImageView
                             android:layout_width="20dp"
                             android:layout_height="15dp"
-                            android:src="@drawable/expandmore"
+                            android:src="@drawable/ic_expand_more"
                             app:tint="#B0B0B0" />
                     </LinearLayout>
 
