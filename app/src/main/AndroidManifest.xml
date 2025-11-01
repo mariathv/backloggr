@@ -22,6 +22,8 @@
         <activity
             android:name=".PrivacynSecurityActivity"/>
 
+        <activity android:name=".EditProfileActivity" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
