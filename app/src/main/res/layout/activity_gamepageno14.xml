@@ -164,9 +164,11 @@
                                 android:text="Action RPG"
                                 android:textColor="#FFFFFF"
                                 android:textSize="12sp"
-                                android:background="@drawable/chip_background"
+                                android:background="#1A1A1A"
                                 android:paddingHorizontal="8dp"
-                                android:paddingVertical="4dp"/>
+                                android:paddingVertical="4dp"
+                                android:cornerRadius="20dp"
+                                />
 
                             <RatingBar
                                 android:id="@+id/gameRating"
@@ -237,25 +239,86 @@
                     android:text="Completed" />
             </LinearLayout>
 
+            <!-- Game Status Buttons -->
             <LinearLayout
+                android:id="@+id/statusButtonsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="16dp">
 
-                <Button
-                    style="@style/StatusButtonInactive"
-                    android:text="Backlogged" />
+                <!-- Row 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
 
-                <Button
-                    style="@style/StatusButtonInactive"
-                    android:text="On Hold" />
+                    <Button
+                        android:id="@+id/btnCurrentlyPlaying"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Currently Playing"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#3B82F6"
+                        android:layout_marginEnd="8dp"/>
 
-                <Button
-                    style="@style/StatusButtonInactive"
-                    android:text="Dropped" />
+                    <Button
+                        android:id="@+id/btnCompleted"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Completed"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#2A2A2A"/>
+                </LinearLayout>
+
+                <!-- Row 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/btnBacklogged"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:backgroundTint="#2A2A2A"
+                        android:text="Backlogged"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnOnHold"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="On Hold"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#2A2A2A"
+                        android:layout_marginEnd="8dp"/>
+
+                    <Button
+                        android:id="@+id/btnDropped"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:text="Dropped"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        android:backgroundTint="#2A2A2A"/>
+                </LinearLayout>
             </LinearLayout>
+
 
             <!-- Progress Message -->
             <TextView
@@ -314,16 +377,60 @@
                     android:textSize="14sp"
                     android:layout_marginBottom="8dp" />
 
-                <Button
-                    android:id="@+id/addPhotoButton"
-                    android:layout_width="wrap_content"
+                <!-- Tab Toolbar -->
+
+
+                <LinearLayout
+                    android:id="@+id/tabToolbar"
+                    android:layout_width="328dp"
                     android:layout_height="wrap_content"
-                    android:text="Add Photo"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:background="@drawable/rounded_pink_button"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="6dp" />
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/tab_toolbar_bg"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
+
+                    <Button
+                        android:id="@+id/btnProgress"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_inactive_bg"
+                        android:text="Progress"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnPhotos"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_active_bg"
+                        android:text="Photos"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnNotes"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_inactive_bg"
+                        android:text="Notes"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+
+                    <Button
+                        android:id="@+id/btnOverview"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/tab_inactive_bg"
+                        android:text="Overview"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/sampleScreenshot"
