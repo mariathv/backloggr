@@ -47,7 +47,6 @@
             android:src="@drawable/profile_placeholder"
             android:background="@drawable/circle_background"
             android:backgroundTint="#FFFF"
-
             android:contentDescription="Profile"
             android:padding="0dp" />
     </LinearLayout>
@@ -71,7 +70,6 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_arrow_back"
             app:tint="#FFFFFF"
-
             android:contentDescription="Back" />
 
         <ImageView
@@ -81,7 +79,7 @@
             android:layout_marginStart="100dp"
             android:src="@drawable/ic_privacy"
             app:tint="#E91E63"
-            android:contentDescription="Question Icon" />
+            android:contentDescription="Privacy Icon" />
 
         <TextView
             android:id="@+id/toolbarTitle"
@@ -137,7 +135,6 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Profile Privacy Section -->
             <!-- Profile Privacy Section with Icon -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -162,7 +159,6 @@
                     android:textStyle="bold"
                     android:textSize="16sp" />
             </LinearLayout>
-
 
             <!-- Profile Visibility Options -->
             <LinearLayout
@@ -222,11 +218,12 @@
                 android:orientation="horizontal"
                 android:background="@drawable/card_background"
                 android:padding="12dp"
-                android:gravity="space_between|center_vertical">
+                android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Game Activity"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
@@ -237,8 +234,7 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:thumbTint="#E91E63"
-                    android:trackTint="#444444"
-                    android:layout_marginStart="180dp"/>
+                    android:trackTint="#444444" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
