@@ -17,6 +17,9 @@
             android:name=".SettingsActivity" />
 
         <activity
+            android:name=".HelpSupportActivity"/>
+
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
