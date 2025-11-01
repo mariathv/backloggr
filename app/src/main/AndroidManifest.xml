@@ -20,6 +20,9 @@
             android:name=".HelpSupportActivity"/>
 
         <activity
+            android:name=".PrivacynSecurityActivity"/>
+
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
