@@ -1,4 +1,4 @@
-package com.example.backloggr
+package com.project.backloggr
 
 import android.app.Activity
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.example.backloggr.R
+import com.project.backloggr.R
 
 
 class EditProfileActivity : AppCompatActivity() {
@@ -25,7 +25,7 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_profile)
+        setContentView(R.layout.activity_editprofile)
 
         // ===== Initialize Views =====
         profileImage = findViewById(R.id.profileImage)
@@ -34,14 +34,18 @@ class EditProfileActivity : AppCompatActivity() {
         backIcon = findViewById(R.id.backIcon)
 
         // EditText fields
-        displayNameInput = findViewById(R.id.basicInfoContainer)
-            .findViewById(R.id.displayName)
-        usernameInput = findViewById(R.id.basicInfoContainer)
-            .findViewById(R.id.username)
-        emailInput = findViewById(R.id.basicInfoContainer)
-            .findViewById(R.id.email)
-        bioInput = findViewById(R.id.basicInfoContainer)
-            .findViewById(R.id.bio)
+//        displayNameInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
+//            .findViewById<EditText>(R.id.displayName)
+//
+//        usernameInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
+//            .findViewById<EditText>(R.id.username)
+//
+//        emailInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
+//            .findViewById<EditText>(R.id.email)
+//
+//        bioInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
+//            .findViewById<EditText>(R.id.bio)
+
 
         // ===== Back Button =====
         backIcon.setOnClickListener {

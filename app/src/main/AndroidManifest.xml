@@ -23,10 +23,11 @@
             android:exported="false" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".HelpSupportActivity" />
-        <activity android:name=".PrivacynSecurityActivity" />
+        <activity android:name=".PrivacynSecurityActivity"
+            />
         <activity android:name=".EditProfileActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".SignUpActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

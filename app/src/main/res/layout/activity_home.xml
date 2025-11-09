@@ -1,404 +1,316 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0D0D0D"
-    android:fillViewport="true">
+    android:background="#0D0D0D">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Header -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingVertical="8dp">
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:contentDescription="Logo"
-                android:src="@drawable/backlogger1"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Backloggr"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
-
-            <TextView
-                android:id="@+id/profileCircle"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="@drawable/profile_circle"
-                android:gravity="center"
-                android:text="GP"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
-
-        <!-- Welcome Message -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Welcome back, GamerPro!"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ready to tackle your backlog?"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp"
-                tools:ignore="HardcodedText" />
-
-            <Button
-                android:id="@+id/btnAddGame"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Add Game"
-                android:textColor="#FFFFFF"
-                android:textSize="13sp"
-                app:backgroundTint="#363636"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
-
-        <!-- Stats Grid -->
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:alignmentMode="alignMargins"
-            android:columnCount="2"
-            android:columnOrderPreserved="false"
-            android:rowCount="2">
-
-            <!-- Total Games -->
+            android:orientation="vertical"
+            android:padding="16dp">
+            <!-- Header -->
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                android:background="@drawable/card_bg"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:contentDescription="Logo"
+                    android:src="@drawable/backlogger1"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
-                    android:id="@+id/tvTotalGamesCount"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="47"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="Backloggr"
                     android:textColor="#FFFFFF"
-                    android:textSize="22sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     tools:ignore="HardcodedText" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total Games"
-                    android:textColor="#AAAAAA"
-                    android:textSize="13sp"
+                    android:id="@+id/profileCircle"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/profile_circle"
+                    android:gravity="center"
+                    android:text="GP"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
-            <!-- Backlogged -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                android:background="@drawable/card_bg"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvBackloggedCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="23"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Backlogged"
-                    android:textColor="#AAAAAA"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <!-- Completed -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                android:background="@drawable/card_bg"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvCompletedCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="15"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Completed"
-                    android:textColor="#AAAAAA"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <!-- Playing -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="6dp"
-                android:background="@drawable/card_bg"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvPlayingCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="9"
-                    android:textColor="#FFFFFF"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Playing"
-                    android:textColor="#AAAAAA"
-                    android:textSize="13sp" />
-            </LinearLayout>
-        </GridLayout>
-
-        <!-- Continue Playing -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android.text="Continue Playing"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <!-- Welcome Message -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Welcome back, GamerPro!"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <!-- Game Card 1 -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ready to tackle your backlog?"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    android:id="@+id/btnAddGame"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Add Game"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    app:backgroundTint="#363636"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <!-- Stats Grid -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:alignmentMode="alignMargins"
+                android:columnCount="2"
+                android:columnOrderPreserved="false"
+                android:rowCount="2">
+
+                <!-- Total Games -->
                 <LinearLayout
-                    android:layout_width="140dp"
-                    android:layout_height="220dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
                     android:background="@drawable/card_bg"
+                    android:gravity="center"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/stray_cover" />
+                    <TextView
+                        android:id="@+id/tvTotalGamesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="47"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        tools:ignore="HardcodedText" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="Stray"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:text="Total Games"
+                        android:textColor="#AAAAAA"
+                        android:textSize="13sp"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
 
-                <!-- Game Card 2 -->
+                <!-- Backlogged -->
                 <LinearLayout
-                    android:layout_width="140dp"
-                    android:layout_height="220dp"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
                     android:background="@drawable/card_bg"
+                    android:gravity="center"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/detroit_cover" />
+                    <TextView
+                        android:id="@+id/tvBackloggedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="23"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
-                        android:text="Detroit"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:text="Backlogged"
+                        android:textColor="#AAAAAA"
+                        android:textSize="13sp" />
                 </LinearLayout>
-            </LinearLayout>
-        </HorizontalScrollView>
 
-        <!-- Recommended -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Recommended for You"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+                <!-- Completed -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/card_bg"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-        <!-- Bottom Navigation -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#141414"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:paddingVertical="8dp">
+                    <TextView
+                        android:id="@+id/tvCompletedCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-            <!-- Home -->
-            <LinearLayout
-                android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Completed"
+                        android:textColor="#AAAAAA"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Playing -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:background="@drawable/card_bg"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvPlayingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="9"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Playing"
+                        android:textColor="#AAAAAA"
+                        android:textSize="13sp" />
+                </LinearLayout>
+            </GridLayout>
+
+            <!-- Continue Playing -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginTop="16dp"
+                android:text="Continue Playing"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/navHome"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_home"
-                    app:tint="#E91E63" />
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Home"
-                    android:textColor="#E91E63"
-                    android:textSize="12sp"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
+                    android:orientation="horizontal">
 
-            <!-- Search -->
-            <LinearLayout
-                android:layout_width="0dp"
+                    <!-- Game Card 1 -->
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="220dp"
+                        android:layout_marginEnd="12dp"
+                        android:background="@drawable/card_bg"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/stray_cover" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:text="Stray"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Game Card 2 -->
+                    <LinearLayout
+                        android:layout_width="140dp"
+                        android:layout_height="220dp"
+                        android:background="@drawable/card_bg"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/detroit_cover" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp"
+                            android:text="Detroit"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Recommended -->
+            <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginTop="24dp"
+                android:text="Recommended for You"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/navExplore"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="#888888" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Explore"
-                    android:textColor="#888888"
-                    android:textSize="12sp"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
-
-            <!-- Library -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/navLibrary"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_library"
-                    app:tint="#888888" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Library"
-                    android:textColor="#888888"
-                    android:textSize="12sp"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
-
-            <!-- Insights -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/navInsights"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_chart"
-                    app:tint="#888888" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Insights"
-                    android:textColor="#888888"
-                    android:textSize="12sp"
-                    tools:ignore="HardcodedText" />
-            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+    <include
+        android:id="@+id/bottomNavigation"
+        layout="@layout/navbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
