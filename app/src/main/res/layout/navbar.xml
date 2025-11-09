@@ -2,7 +2,6 @@
 <com.google.android.material.bottomnavigation.BottomNavigationView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/bottomNavigation"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#1A1A1A"
@@ -11,7 +10,7 @@
     app:itemIconSize="22dp"
     app:itemIconTint="@color/bottom_nav_color"
     app:itemTextColor="@color/bottom_nav_color"
-    app:style="@style/BottomNavCompact"
+    style="@style/BottomNavCompact"
     app:labelVisibilityMode="labeled"
     app:itemActiveIndicatorStyle="@style/BottomNavIndicator"
     app:menu="@menu/bottom_nav_menu" />

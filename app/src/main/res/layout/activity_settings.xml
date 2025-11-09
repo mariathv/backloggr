@@ -373,6 +373,7 @@
 
                 <!-- Privacy & Security -->
                 <LinearLayout
+                    android:id="@+id/privacySection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -418,7 +419,56 @@
                         android:src="@drawable/baseline_arrow_forward_24"
                         app:tint="#FFFFFF" />
                 </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/aboutSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="16dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_info"
+                        app:tint="#E91E63"
+                        android:background="@drawable/circle_background"
+                        android:padding="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:text="About Backloggr"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            />
+
+                        <TextView
+                            android:text="Learn more about the Backloggr app"
+                            android:textColor="#AAAAAA"
+                            android:textSize="13sp"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/baseline_arrow_forward_24"
+                        app:tint="#FFFFFF" />
+                </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

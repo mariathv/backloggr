@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1A1A1A">
+    android:background="#1A1A1A"
+    android:id="@+id/main">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -248,6 +249,7 @@
 
                     <!-- Game Cover Image (fills the card) -->
                     <ImageView
+                        android:id="@+id/gameCover"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:adjustViewBounds="true"
@@ -467,7 +469,7 @@
         app:itemIconSize="22dp"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
-        app:style="@style/BottomNavCompact"
+        style="@style/BottomNavCompact"
         app:labelVisibilityMode="labeled"
         app:itemActiveIndicatorStyle="@style/BottomNavIndicator"
         app:menu="@menu/bottom_nav_menu"

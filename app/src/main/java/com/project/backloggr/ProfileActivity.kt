@@ -13,8 +13,8 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         val settingsIcon = findViewById<ImageView>(R.id.settingsIcon)
-        val homeButton = findViewById<LinearLayout>(R.id.homeButton)
-        val searchButton = findViewById<LinearLayout>(R.id.searchButton)
+//        val homeButton = findViewById<LinearLayout>(R.id.homeButton)
+//        val searchButton = findViewById<LinearLayout>(R.id.searchButton)
         // You can add the other buttons here as well
 
         settingsIcon.setOnClickListener {
@@ -22,16 +22,16 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        homeButton.setOnClickListener {
-            val intent = Intent(this, HomeActivity::class.java)
-            startActivity(intent)
-            finish() // Optional: finish ProfileActivity so you can't go back to it
-        }
-
-        searchButton.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
-            finish() // Optional: finish ProfileActivity
-        }
+//        homeButton.setOnClickListener {
+//            val intent = Intent(this, HomeActivity::class.java)
+//            startActivity(intent)
+//            finish() // Optional: finish ProfileActivity so you can't go back to it
+//        }
+//
+//        searchButton.setOnClickListener {
+//            val intent = Intent(this, SearchActivity::class.java)
+//            startActivity(intent)
+//            finish() // Optional: finish ProfileActivity
+//        }
     }
 }

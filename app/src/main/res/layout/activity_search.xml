@@ -107,6 +107,7 @@
                     android:padding="6dp">
 
                     <ImageView
+                        android:id="@+id/gameCover"
                         android:layout_width="match_parent"
                         android:layout_height="180dp"
                         android:scaleType="centerCrop"

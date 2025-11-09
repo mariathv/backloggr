@@ -1,29 +1,72 @@
 package com.project.backloggr
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
+    private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var profileCircle: TextView
+
+    private lateinit var gameCover: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val btnAddGame = findViewById<Button>(R.id.btnAddGame)
-        val navHome = findViewById<ImageView>(R.id.navHome)
-        val navExplore = findViewById<ImageView>(R.id.navExplore)
-        val navLibrary = findViewById<ImageView>(R.id.navLibrary)
-        val navInsights = findViewById<ImageView>(R.id.navInsights)
 
-        btnAddGame.setOnClickListener {
-            Toast.makeText(this, "Add Game clicked!", Toast.LENGTH_SHORT).show()
+
+        initViews()
+        setupListeners()
+
+    }
+
+    private fun initViews() {
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+        bottomNavigation.selectedItemId = R.id.nav_home
+        profileCircle = findViewById(R.id.profileCircle)
+        gameCover = findViewById(R.id.gameCover)
+
+
+    }
+
+    private fun setupListeners() {
+        // Bottom navigation clicks
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+
+                }
+                R.id.nav_explore -> {
+                    startActivity(Intent(this, SearchActivity::class.java))
+                    finish()
+                }
+                R.id.nav_library -> {
+                    startActivity(Intent(this, LibraryActivity::class.java))
+                    finish()
+                }
+                R.id.nav_insights -> {
+                    startActivity(Intent(this, InsightsActivity::class.java))
+                    finish()
+                }
+            }
+            true
         }
 
-        navHome.setOnClickListener { Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show() }
-        navExplore.setOnClickListener { Toast.makeText(this, "Explore", Toast.LENGTH_SHORT).show() }
-        navLibrary.setOnClickListener { Toast.makeText(this, "Library", Toast.LENGTH_SHORT).show() }
-        navInsights.setOnClickListener { Toast.makeText(this, "Insights", Toast.LENGTH_SHORT).show() }
+        gameCover.setOnClickListener {
+            startActivity(Intent(this, GameDetailActivity::class.java))
+            finish()
+        }
+
+
+        profileCircle.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+            finish()
+        }
+
     }
 }
 

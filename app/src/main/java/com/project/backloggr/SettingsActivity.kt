@@ -1,5 +1,6 @@
 package com.project.backloggr
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.*
@@ -16,6 +17,8 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var btnEdit: Button
     private lateinit var backIcon: ImageView
     private lateinit var privacySection: LinearLayout
+    private lateinit var aboutSection: LinearLayout
+
 
     private lateinit var prefs: SharedPreferences
 
@@ -32,7 +35,10 @@ class SettingsActivity : AppCompatActivity() {
         switchNotifications = findViewById(R.id.switchNotifications)
         btnEdit = findViewById(R.id.btnEdit)
         backIcon = findViewById(R.id.backIcon)
-        privacySection = findViewById(R.id.settingsSection)
+        privacySection = findViewById(R.id.privacySection)
+        aboutSection = findViewById(R.id.aboutSection)
+
+
 
         // Load saved preferences
         loadSettings()
@@ -76,16 +82,17 @@ class SettingsActivity : AppCompatActivity() {
 
         // Edit Profile button
         btnEdit.setOnClickListener {
-            Toast.makeText(this, "Edit profile clicked", Toast.LENGTH_SHORT).show()
-            // Example:
-            // startActivity(Intent(this, EditProfileActivity::class.java))
+            startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
         // Privacy & Security section click
         privacySection.setOnClickListener {
-            Toast.makeText(this, "Privacy settings clicked", Toast.LENGTH_SHORT).show()
-            // Example:
-            // startActivity(Intent(this, PrivacyActivity::class.java))
+            startActivity(Intent(this, PrivacynSecurityActivity::class.java))
+        }
+
+        aboutSection.setOnClickListener {
+           // startActivity(Intent(this, About::class.java))
+
         }
     }
 

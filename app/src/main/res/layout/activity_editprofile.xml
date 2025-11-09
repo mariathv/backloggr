@@ -102,7 +102,6 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             app:backgroundTint="#FF007F"
-            android:background="@drawable/rounded_pink_button"
             android:layout_marginStart="40dp"
             />
     </LinearLayout>
