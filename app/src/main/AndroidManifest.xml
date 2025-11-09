@@ -12,27 +12,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Backloggr">
-
         <activity
-            android:name=".SettingsActivity" />
-
-        <activity
-            android:name=".HelpSupportActivity"/>
-
-        <activity
-            android:name=".PrivacynSecurityActivity"/>
-
+            android:name=".LibraryActivity"
+            android:exported="false" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".HelpSupportActivity" />
+        <activity android:name=".PrivacynSecurityActivity" />
         <activity android:name=".EditProfileActivity" />
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

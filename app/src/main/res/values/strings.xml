@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Backloggr</string>
+    <string-array name="platforms">
+        <item>All Platforms</item>
+        <item>PC</item>
+        <item>PlayStation</item>
+        <item>Xbox</item>
+        <item>Nintendo</item>
+        <item>Mobile</item>
+    </string-array>
 </resources>
