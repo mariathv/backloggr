@@ -28,7 +28,9 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
 
@@ -47,5 +49,3 @@ class LoginActivity : AppCompatActivity() {
         btnSteam.setOnClickListener { Toast.makeText(this, "Steam sign-in coming soon", Toast.LENGTH_SHORT).show() }
     }
 }
-
-
