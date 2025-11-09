@@ -599,7 +599,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -668,7 +668,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -696,16 +696,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Add Photo"
-                        android:textColor="#00A8E8"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp" />
                 </LinearLayout>
 
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:src="@drawable/screenshot_placeholder"
-                    android:scaleType="centerCrop"
-                    android:background="@drawable/image_background" />
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ss_tlou2_1"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Screenshot" />
+
             </LinearLayout>
         </FrameLayout>
 
