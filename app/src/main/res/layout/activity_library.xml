@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1A1A1A"
-    android:id="@+id/main">
+    android:id="@+id/main"
+   >
 
     <!-- Top Bar -->
     <LinearLayout
@@ -15,14 +16,14 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="34dp">
 
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/backlogger1"
-            android:contentDescription="App Icon"
-             />
+            android:contentDescription="App Icon" />
 
         <TextView
             android:layout_width="0dp"
@@ -111,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:text="All (6)"
                 android:textColor="#FFFFFF"
-                app:chipBackgroundColor="#0080FF"
+                app:chipBackgroundColor="@color/primary"
                 app:checkedIconVisible="false" />
 
             <com.google.android.material.chip.Chip
@@ -200,8 +201,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
     <!-- Games Count -->
     <TextView
         android:id="@+id/tvGamesCount"
@@ -216,247 +215,16 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Games RecyclerView -->
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/gamesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:padding="16dp"
+        android:padding="8dp"
+        android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@id/tvGamesCount"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
-
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:orientation="horizontal"
-            android:alignmentMode="alignMargins"
-            android:columnOrderPreserved="false"
-            android:useDefaultMargins="true">
-
-            <!-- Game Card 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <!-- Game Cover Image (fills the card) -->
-                    <ImageView
-                        android:id="@+id/gameCover"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/cover_lastofus1"
-                        android:contentDescription="Game Cover" />
-
-                    <!-- Status Badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playing"
-                        android:textColor="#FFFFFF"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/status_badge_background"
-                        android:layout_gravity="top|start" />
-
-
-                    <!-- Game Title (bottom overlay) -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="The Last of Us Part 1"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:layout_gravity="bottom" />
-
-                </FrameLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <!-- Game Cover Image (fills the card) -->
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/cover_lastofus2"
-                        android:contentDescription="Game Cover" />
-
-                    <!-- Status Badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playing"
-                        android:textColor="#FFFFFF"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/status_badge_background"
-                        android:layout_gravity="top|start" />
-
-
-
-                    <!-- Game Title (bottom overlay) -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="The Last of Us Part 2"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:layout_gravity="bottom" />
-
-                </FrameLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Game Card 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <!-- Game Cover Image (fills the card) -->
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/detroit_cover"
-                        android:contentDescription="Game Cover" />
-
-                    <!-- Status Badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playing"
-                        android:textColor="#FFFFFF"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/status_badge_background"
-                        android:layout_gravity="top|start" />
-
-
-                    <!-- Game Title (bottom overlay) -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Detroit Become Human"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:layout_gravity="bottom" />
-
-                </FrameLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/transparent">
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <!-- Game Cover Image (fills the card) -->
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/stray_cover"
-                        android:contentDescription="Game Cover" />
-
-                    <!-- Status Badge -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Playing"
-                        android:textColor="#FFFFFF"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/status_badge_background"
-                        android:layout_gravity="top|start" />
-
-
-
-                    <!-- Game Title (bottom overlay) -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Stray"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:layout_gravity="bottom" />
-
-                </FrameLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-
-        </GridLayout>
-
-    </ScrollView>
-
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        tools:listitem="@layout/item_library_game" />
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#D6246E</color>
     <color name="unselected">#8B92A8</color>
+    <color name="chip_background_active">#0080FF</color>
+    <color name="chip_background_inactive">#2A2A2A</color>
 </resources>
