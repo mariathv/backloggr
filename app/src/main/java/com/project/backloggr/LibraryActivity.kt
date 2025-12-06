@@ -78,7 +78,6 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        // Initialize adapter with empty list
         libraryAdapter = LibraryAdapter(mutableListOf(), isGridView)
         gamesRecyclerView.adapter = libraryAdapter
         updateLayoutManager()
@@ -205,6 +204,8 @@ class LibraryActivity : AppCompatActivity() {
                         val gameJson = gamesArray.getJSONObject(i)
                         val details = gameJson.optJSONObject("game_details")
                         val title = details?.optString("name") ?: "Game #${gameJson.optInt("igdb_game_id", 0)}"
+                        val libraryId = gameJson.getInt("id")
+                        val igdbGameId = gameJson.getInt("igdb_game_id")
 
                         var coverUrl = ""
                         details?.optJSONObject("cover")?.let {
@@ -212,7 +213,7 @@ class LibraryActivity : AppCompatActivity() {
                             if (urlPath.isNotEmpty()) coverUrl = "https:" + urlPath.replace("t_thumb", "t_cover_big")
                         }
 
-                        newGames.add(Game(title, coverUrl, gameJson.optString("status")))
+                        newGames.add(Game(libraryId, igdbGameId, title, coverUrl, gameJson.optString("status")))
                     }
 
                     Log.d("LibraryActivity", "Parsed ${newGames.size} games, updating adapter")

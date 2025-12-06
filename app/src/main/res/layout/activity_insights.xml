@@ -15,7 +15,8 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="34dp">
 
         <ImageView
             android:layout_width="32dp"
@@ -56,219 +57,63 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Stats Grid -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="2"
-                android:rowCount="2"
-                android:alignmentMode="alignMargins"
-                android:columnOrderPreserved="false"
-                android:useDefaultMargins="false">
+                android:rowCount="4">
 
-                <!-- Total Games Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="0"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="#2A2A2A"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="52"
-                                android:textColor="#FFFFFF"
-                                android:textSize="32sp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_gamepad"
-                                app:tint="#FF1493" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total Games"
-                            android:textColor="#888888"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvTotalGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Total Games" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Total Playtime Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="0"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="#2A2A2A"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="406h"
-                                android:textColor="#FFFFFF"
-                                android:textSize="32sp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_time"
-                                 />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Total Playtime"
-                            android:textColor="#888888"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvTotalHours" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Total Playtime" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Completion Rate Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="0"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="#2A2A2A"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="29%"
-                                android:textColor="#FFFFFF"
-                                android:textSize="32sp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_trophy"
-                                />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Completion Rate"
-                            android:textColor="#888888"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvCompletedGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Completed" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- This Month Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_row="1"
-                    android:layout_column="1"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="4dp"
-                    app:cardBackgroundColor="#2A2A2A"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp">
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvPlayingGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Playing" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvBackloggedGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Backlogged" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvOnHoldGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="On Hold" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="3"
-                                android:textColor="#FFFFFF"
-                                android:textSize="32sp"
-                                android:textStyle="bold" />
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_calendar"
-                                 />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="This Month"
-                            android:textColor="#888888"
-                            android:textSize="12sp"
-                            android:layout_marginTop="4dp" />
+                 <com.google.android.material.card.MaterialCardView style="@style/InsightCard">
+                    <LinearLayout style="@style/InsightCardContent">
+                        <TextView android:id="@+id/tvDroppedGames" style="@style/InsightCardValue" />
+                        <TextView style="@style/InsightCardLabel" android:text="Dropped" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </GridLayout>
 
-            <!-- Game Status Distribution -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -279,205 +124,53 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Donut Chart Container -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="#2A2A2A"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
+                app:cardCornerRadius="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:gravity="center">
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <!-- Donut Chart Placeholder -->
-                    <FrameLayout
-                        android:id="@+id/chartContainer"
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        android:layout_gravity="center">
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp" />
 
-                        <!-- Outer Circle (Gray Background) -->
-                        <View
-                            android:layout_width="240dp"
-                            android:layout_height="240dp"
-                            android:background="@drawable/circle_gray" />
-
-                        <!-- Inner Circle (Dark Background for donut hole) -->
-                        <View
-                            android:layout_width="140dp"
-                            android:layout_height="140dp"
-                            android:layout_gravity="center"
-                            android:background="@drawable/circle_dark" />
-
-                    </FrameLayout>
-
-                    <!-- Legend -->
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:orientation="vertical"
-                        android:layout_marginTop="24dp">
+                        android:layout_marginStart="16dp">
 
-                        <!-- Row 1 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <View
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:background="@drawable/circle_gray" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Backlogged (23)"
-                                    android:textColor="#888888"
-                                    android:textSize="12sp"
-                                    android:layout_marginStart="8dp" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <View
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:background="@drawable/circle_purple" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Playing (8)"
-                                    android:textColor="#888888"
-                                    android:textSize="12sp"
-                                    android:layout_marginStart="8dp" />
-                            </LinearLayout>
+                        <LinearLayout android:id="@+id/legendItemPlaying" style="@style/LegendItem">
+                            <View style="@style/LegendIndicator" android:background="#e57373"/>
+                            <TextView android:id="@+id/tvLegendPlaying" style="@style/LegendLabel" />
                         </LinearLayout>
-
-                        <!-- Row 2 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="12dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <View
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:background="@drawable/circle_green" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Completed (15)"
-                                    android:textColor="#888888"
-                                    android:textSize="12sp"
-                                    android:layout_marginStart="8dp" />
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical">
-
-                                <View
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:background="@drawable/circle_orange" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="On Hold (4)"
-                                    android:textColor="#888888"
-                                    android:textSize="12sp"
-                                    android:layout_marginStart="8dp" />
-                            </LinearLayout>
+                        <LinearLayout android:id="@+id/legendItemCompleted" style="@style/LegendItem">
+                            <View style="@style/LegendIndicator" android:background="#81c784"/>
+                            <TextView android:id="@+id/tvLegendCompleted" style="@style/LegendLabel" />
                         </LinearLayout>
-
-                        <!-- Row 3 -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginTop="12dp">
-
-                            <View
-                                android:layout_width="12dp"
-                                android:layout_height="12dp"
-                                android:background="@drawable/circle_red" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Dropped (2)"
-                                android:textColor="#888888"
-                                android:textSize="12sp"
-                                android:layout_marginStart="8dp" />
+                        <LinearLayout android:id="@+id/legendItemBacklogged" style="@style/LegendItem">
+                            <View style="@style/LegendIndicator" android:background="#64b5f6"/>
+                            <TextView android:id="@+id/tvLegendBacklogged" style="@style/LegendLabel" />
+                        </LinearLayout>
+                        <LinearLayout android:id="@+id/legendItemOnHold" style="@style/LegendItem">
+                            <View style="@style/LegendIndicator" android:background="#ffb74d"/>
+                            <TextView android:id="@+id/tvLegendOnHold" style="@style/LegendLabel" />
+                        </LinearLayout>
+                        <LinearLayout android:id="@+id/legendItemDropped" style="@style/LegendItem">
+                            <View style="@style/LegendIndicator" android:background="#90a4ae"/>
+                            <TextView android:id="@+id/tvLegendDropped" style="@style/LegendLabel" />
                         </LinearLayout>
 
                     </LinearLayout>
-
                 </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Monthly Activity -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Monthly Activity"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Activity Chart Placeholder -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                app:cardBackgroundColor="#2A2A2A"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chart will be rendered here"
-                    android:textColor="#666666"
-                    android:layout_gravity="center" />
-
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
@@ -490,8 +183,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#1A1A1A"
-        android:paddingTop="0dp"
-        android:paddingBottom="0dp"
         app:itemIconSize="22dp"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
@@ -499,7 +190,6 @@
         app:labelVisibilityMode="labeled"
         app:itemActiveIndicatorStyle="@style/BottomNavIndicator"
         app:menu="@menu/bottom_nav_menu"
-
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
