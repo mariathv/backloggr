@@ -2,13 +2,21 @@ package com.project.backloggr
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
-import com.project.backloggr.R
-
+import org.json.JSONObject
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -22,76 +30,168 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var backIcon: ImageView
 
     private val PICK_IMAGE_REQUEST = 101
+    private var selectedImageUri: Uri? = null
+    private var uploadedImageBase64: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_editprofile)
 
-        // ===== Initialize Views =====
+        initViews()
+        loadUserProfile()
+        setupListeners()
+    }
+
+    private fun initViews() {
         profileImage = findViewById(R.id.profileImage)
         changePhotoButton = findViewById(R.id.changePhotoButton)
         saveButton = findViewById(R.id.btnsave)
         backIcon = findViewById(R.id.backIcon)
 
-        // EditText fields
-//        displayNameInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
-//            .findViewById<EditText>(R.id.displayName)
-//
-//        usernameInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
-//            .findViewById<EditText>(R.id.username)
-//
-//        emailInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
-//            .findViewById<EditText>(R.id.email)
-//
-//        bioInput = findViewById<LinearLayout>(R.id.basicInfoContainer)
-//            .findViewById<EditText>(R.id.bio)
+        displayNameInput = findViewById(R.id.displayName)
+        usernameInput = findViewById(R.id.username)
+        emailInput = findViewById(R.id.email)
+        bioInput = findViewById(R.id.Bio)
+    }
 
-
-        // ===== Back Button =====
-        backIcon.setOnClickListener {
-            finish()
-        }
-
-        // ===== Change Photo =====
-        changePhotoButton.setOnClickListener {
-            openGallery()
-        }
-
-        // ===== Save Button =====
+    private fun setupListeners() {
+        backIcon.setOnClickListener { finish() }
+        changePhotoButton.setOnClickListener { openGallery() }
         saveButton.setOnClickListener {
-            saveProfile()
+            if (selectedImageUri != null) {
+                uploadImageThenSaveProfile()
+            } else {
+                saveProfile(uploadedImageBase64)
+            }
         }
     }
 
-    // ===== Open Image Picker =====
+    private fun loadUserProfile() {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: return
+
+        val url = "${BuildConfig.BASE_URL}api/auth/profile"
+
+        val request = object : JsonObjectRequest(
+            Method.GET,
+            url,
+            null,
+            { response ->
+                try {
+                    val userData = response.getJSONObject("data").getJSONObject("user")
+                    displayNameInput.setText(userData.optString("display_name", ""))
+                    usernameInput.setText(userData.optString("username", ""))
+                    emailInput.setText(userData.optString("email", ""))
+                    bioInput.setText(userData.optString("bio", ""))
+
+                    // Load existing profile image
+                    val imageBase64 = userData.optString("profile_image_url", "")
+                    if (imageBase64.isNotEmpty()) {
+                        uploadedImageBase64 = imageBase64
+                        val decodedBytes = android.util.Base64.decode(imageBase64, android.util.Base64.DEFAULT)
+                        val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+                        profileImage.setImageBitmap(bitmap)
+                    }
+                } catch (e: Exception) {
+                    Log.e("EditProfile", "Error parsing profile", e)
+                }
+            },
+            { error ->
+                Log.e("EditProfile", "Failed to load profile", error)
+                Toast.makeText(this, "Failed to load profile", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getHeaders() = hashMapOf("Authorization" to "Bearer $token")
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
-    // ===== Handle Image Result =====
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            val imageUri: Uri? = data.data
-            profileImage.setImageURI(imageUri)
+            selectedImageUri = data.data
+            profileImage.setImageURI(selectedImageUri)
         }
     }
 
-    // ===== Save Profile Info =====
-    private fun saveProfile() {
-        val displayName = displayNameInput.text.toString()
-        val username = usernameInput.text.toString()
-        val email = emailInput.text.toString()
-        val bio = bioInput.text.toString()
+    private fun uploadImageThenSaveProfile() {
+        val uri = selectedImageUri ?: return
+        saveButton.isEnabled = false
 
-        if (displayName.isBlank() || username.isBlank() || email.isBlank()) {
-            Snackbar.make(saveButton, "Please fill out all required fields.", Snackbar.LENGTH_SHORT).show()
+        try {
+            val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 80, baos)
+            val imageBytes = baos.toByteArray()
+            val base64Image = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT)
+            uploadedImageBase64 = base64Image
+
+            // After encoding image, save profile
+            saveProfile(base64Image)
+
+        } catch (e: IOException) {
+            saveButton.isEnabled = true
+            Toast.makeText(this, "Failed to read image", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun saveProfile(profileImageBase64: String?) {
+        val displayName = displayNameInput.text.toString().trim()
+        val username = usernameInput.text.toString().trim()
+        val email = emailInput.text.toString().trim()
+        val bio = bioInput.text.toString().trim()
+
+        if (username.isEmpty() || email.isEmpty()) {
+            Snackbar.make(saveButton, "Username and email are required", Snackbar.LENGTH_SHORT).show()
+            saveButton.isEnabled = true
             return
         }
 
-        // Simulate saving user profile (you can integrate Firebase or database here)
-        Snackbar.make(saveButton, "Profile saved successfully!", Snackbar.LENGTH_SHORT).show()
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null)
+        if (token == null) {
+            Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        val jsonBody = JSONObject().apply {
+            put("display_name", displayName)
+            put("username", username)
+            put("email", email)
+            put("bio", bio)
+            put("profile_image_url", profileImageBase64 ?: "")
+        }
+
+        val url = "${BuildConfig.BASE_URL}api/auth/profile"
+
+        val request = object : JsonObjectRequest(
+            Method.PUT,
+            url,
+            jsonBody,
+            { response ->
+                saveButton.isEnabled = true
+                Snackbar.make(saveButton, "Profile updated successfully!", Snackbar.LENGTH_SHORT).show()
+            },
+            { error ->
+                saveButton.isEnabled = true
+                Log.e("EditProfile", "Update failed", error)
+                Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer $token",
+                "Content-Type" to "application/json"
+            )
+        }
+
+        Volley.newRequestQueue(this).add(request)
     }
 }

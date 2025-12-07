@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -78,7 +78,7 @@
             android:id="@+id/profile"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="110dp"
+            android:layout_marginStart="80dp"
             android:src="@drawable/profile"
             app:tint="#E91E63"
             android:contentDescription="Gear Icon" />
@@ -95,14 +95,14 @@
 
         <Button
             android:id="@+id/btnsave"
-            android:layout_width="match_parent"
+            android:layout_width="80dp"
             android:layout_height="40dp"
             android:layout_marginTop="0dp"
             android:text="Save"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             app:backgroundTint="#FF007F"
-            android:layout_marginStart="40dp"
+            android:layout_marginStart="25dp"
             />
     </LinearLayout>
 
@@ -179,6 +179,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
         <EditText
+            android:id="@+id/displayName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="GamerPro"
@@ -197,6 +198,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
         <EditText
+            android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="gamerpro2024"
@@ -214,6 +216,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
         <EditText
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="gamerpro@example.com"
@@ -231,6 +234,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"/>
         <EditText
+            android:id="@+id/Bio"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:gravity="top"
