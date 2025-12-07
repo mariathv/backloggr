@@ -81,7 +81,7 @@
             android:background="@drawable/circle_background"
             android:backgroundTint="#2c1a25"
             app:tint="#E91E63"
-            android:layout_marginStart="110dp"
+            android:layout_marginStart="60dp"
             android:padding="1dp" />
 
         <TextView
@@ -230,33 +230,12 @@
                         <TextView
                             android:text="Track your gaming backlog"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
 
-                    <!-- Feature 2 -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
 
-                        <View
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:backgroundTint="#E91E63"
-                            android:background="@drawable/dot"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:text="Progress monitoring"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                    </LinearLayout>
 
                     <!-- Feature 3 -->
                     <LinearLayout
@@ -277,7 +256,7 @@
                         <TextView
                             android:text="Personal screenshots"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -300,7 +279,7 @@
                         <TextView
                             android:text="Game recommendations"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -323,7 +302,7 @@
                         <TextView
                             android:text="Community reviews"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -346,7 +325,7 @@
                         <TextView
                             android:text="Cross-device sync"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -369,7 +348,7 @@
                         <TextView
                             android:text="Achievement tracking"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -392,7 +371,29 @@
                         <TextView
                             android:text="Detailed insights"
                             android:textColor="#FFFFFF"
-                            android:textSize="14sp"
+                            android:textSize="11sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                    <!-- Feature 2 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <View
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:backgroundTint="#E91E63"
+                            android:background="@drawable/dot"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:text="Progress monitoring"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
                     </LinearLayout>

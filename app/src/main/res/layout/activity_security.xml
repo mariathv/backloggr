@@ -77,7 +77,7 @@
             android:id="@+id/privacy"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="100dp"
+            android:layout_marginStart="70dp"
             android:src="@drawable/ic_privacy"
             app:tint="#E91E63"
             android:contentDescription="Privacy Icon" />

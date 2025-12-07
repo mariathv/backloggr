@@ -44,6 +44,11 @@
             android:exported="false"/>
         <activity android:name=".HomeActivity" />
         <activity android:name=".SearchActivity" />
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Backloggr" />
     </application>
+
 
 </manifest>

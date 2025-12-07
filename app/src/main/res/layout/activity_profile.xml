@@ -98,6 +98,7 @@
                             app:tint="#AAAAAA" />
 
                         <TextView
+                            android:id="@+id/joinDate"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Joined January 2024"
@@ -132,6 +133,7 @@
                     android:orientation="vertical"
                     android:gravity="center">
                     <TextView
+                        android:id="@+id/totalGames"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="52"
@@ -153,6 +155,7 @@
                     android:orientation="vertical"
                     android:gravity="center">
                     <TextView
+                        android:id="@+id/completedGames"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="15"
@@ -174,6 +177,7 @@
                     android:orientation="vertical"
                     android:gravity="center">
                     <TextView
+                        android:id="@+id/playTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="406h"
