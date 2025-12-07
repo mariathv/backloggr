@@ -30,7 +30,7 @@ class EditProfileActivity : AppCompatActivity() {
         // ===== Initialize Views =====
         profileImage = findViewById(R.id.profileImage)
         changePhotoButton = findViewById(R.id.changePhotoButton)
-        saveButton = findViewById(R.id.btnSignIn)
+        saveButton = findViewById(R.id.btnsave)
         backIcon = findViewById(R.id.backIcon)
 
         // EditText fields
