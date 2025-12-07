@@ -95,14 +95,15 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 
         <Button
             android:id="@+id/btnsave"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
+            android:layout_width="75dp"
+            android:layout_height="35dp"
             android:layout_marginTop="0dp"
             android:text="Save"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
+            android:textSize="10dp"
             app:backgroundTint="#FF007F"
-            android:layout_marginStart="25dp"
+            android:layout_marginStart="30dp"
             />
     </LinearLayout>
 

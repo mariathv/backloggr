@@ -22,6 +22,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var backIcon: ImageView
     private lateinit var privacySection: LinearLayout
     private lateinit var aboutSection: LinearLayout
+    private lateinit var helpSupportSection: LinearLayout
 
     private lateinit var prefs: SharedPreferences
     private var currentProfile: JSONObject? = null
@@ -41,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
         backIcon = findViewById(R.id.backIcon)
         privacySection = findViewById(R.id.privacySection)
         aboutSection = findViewById(R.id.aboutSection)
+        helpSupportSection = findViewById(R.id.helpSupportSection)
 
         // Disable switches until profile loads
         setSwitchesEnabled(false)
@@ -88,6 +90,11 @@ class SettingsActivity : AppCompatActivity() {
 
         aboutSection.setOnClickListener {
             startActivity(Intent(this, AboutActivity::class.java))
+        }
+
+        // Help & Support section
+        helpSupportSection.setOnClickListener {
+            startActivity(Intent(this, HelpSupportActivity::class.java))
         }
     }
 

@@ -17,10 +17,10 @@ import org.json.JSONException
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var bottomNavigation: BottomNavigationView
+    /*private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var searchInput: EditText
     private lateinit var gamesRecyclerView: RecyclerView
-    private lateinit var gameAdapter: GameAdapter
+    //private lateinit var gameAdapter: GameAdapter
     private val games = mutableListOf<Game>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,5 +114,5 @@ class SearchActivity : AppCompatActivity() {
         )
 
         Volley.newRequestQueue(this).add(request)
-    }
+    }*/
 }

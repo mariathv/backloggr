@@ -79,7 +79,7 @@
             android:id="@+id/questionIcon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginStart="110dp"
+            android:layout_marginStart="73dp"
             android:src="@drawable/question"
             app:tint="#E91E63"
             android:contentDescription="Question Icon" />
