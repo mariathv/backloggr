@@ -3,7 +3,6 @@ package com.project.backloggr
 import VolleyMultipartRequest
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -23,6 +22,7 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.util.Log
 
 class GameDetailActivity : AppCompatActivity() {
     private lateinit var db: DatabaseHelper
@@ -87,6 +87,12 @@ class GameDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val fromNotification = intent.getBooleanExtra("FROM_NOTIFICATION", false)
+        if (fromNotification) {
+            Log.d("GameDetailActivity", "Opened from notification")
+            // You can add special behavior here if needed
+        }
         enableEdgeToEdge()
         setContentView(R.layout.activity_game_detail)
 

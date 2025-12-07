@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-
+import com.project.backloggr.utils.FCMTokenManager
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var usernameTextView: TextView
@@ -37,11 +37,20 @@ class ProfileActivity : AppCompatActivity() {
 
         btnLogout.setOnClickListener {
             val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
-            prefs.edit().remove("token").apply()
+            val token = prefs.getString("token", null)
+
+            // Delete FCM token from server
+            if (token != null) {
+                FCMTokenManager.deleteTokenFromServer(this, token)
+            }
+
+            // Clear all preferences
+            prefs.edit().clear().apply()
 
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
+            finish()
         }
     }
 

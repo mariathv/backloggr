@@ -8,13 +8,21 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.project.backloggr.utils.FCMTokenManager
 
 class LoginActivity : AppCompatActivity() {
+    companion object {
+        private const val REQUEST_NOTIFICATION_PERMISSION = 1001}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val prefs = getSharedPreferences("BackloggrPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null)
 
         if (token != null) {
@@ -65,6 +73,9 @@ class LoginActivity : AppCompatActivity() {
                         prefs.edit().putString("token", token).apply()
                     }
 
+                    requestNotificationPermission()
+                    FCMTokenManager.retrieveAndSendToken(this@LoginActivity, token)
+
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -92,4 +103,20 @@ class LoginActivity : AppCompatActivity() {
         btnXbox.setOnClickListener { Toast.makeText(this, "Xbox sign-in coming soon", Toast.LENGTH_SHORT).show() }
         btnSteam.setOnClickListener { Toast.makeText(this, "Steam sign-in coming soon", Toast.LENGTH_SHORT).show() }
     }
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    REQUEST_NOTIFICATION_PERMISSION
+                )
+            }
+        }
+    }
 }
+

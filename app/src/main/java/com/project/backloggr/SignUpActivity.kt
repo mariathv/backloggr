@@ -8,6 +8,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.Request
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
+import com.project.backloggr.utils.FCMTokenManager
 
 class SignUpActivity : AppCompatActivity() {
 
@@ -58,9 +59,10 @@ class SignUpActivity : AppCompatActivity() {
 
                     val token = response.optJSONObject("data")?.optString("token")
                     if (!token.isNullOrEmpty()) {
-                        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                        val prefs = getSharedPreferences("BackloggrPrefs", MODE_PRIVATE)
                         prefs.edit().putString("token", token).apply()
                     }
+                    FCMTokenManager.retrieveAndSendToken(this@SignUpActivity, token)
 
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)

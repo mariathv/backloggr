@@ -15,6 +15,7 @@ import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.json.JSONObject
+import com.project.backloggr.utils.FCMTokenManager
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var bottomNavigation: BottomNavigationView
@@ -36,6 +37,12 @@ class HomeActivity : AppCompatActivity() {
         setupListeners()
         fetchStatistics()
         fetchPlayingGames()
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null)
+
+        if (token != null && !FCMTokenManager.isTokenSent(this)) {
+            FCMTokenManager.retrieveAndSendToken(this, token)
+        }
     }
 
     override fun onResume() {
