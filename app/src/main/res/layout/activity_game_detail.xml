@@ -7,11 +7,13 @@
     android:background="#1A1A1A"
     android:id="@+id/main">
     <ScrollView
-
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="#1A1A1A"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -361,10 +363,10 @@
                     android:paddingEnd="16dp">
 
                     <TextView
-                        android:id="@+id/tabProgress"
+                        android:id="@+id/tabOverview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Progress"
+                        android:text="Overview"
                         android:textColor="#8B92A8"
                         android:textSize="15sp"
                         android:paddingStart="16dp"
@@ -396,10 +398,10 @@
                         android:paddingBottom="12dp" />
 
                     <TextView
-                        android:id="@+id/tabOverview"
+                        android:id="@+id/tabProgress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Overview"
+                        android:text="Progress"
                         android:textColor="#8B92A8"
                         android:textSize="15sp"
                         android:paddingStart="16dp"
@@ -418,46 +420,6 @@
                 android:paddingEnd="16dp"
                 android:paddingTop="16dp"
                 android:paddingBottom="24dp">
-
-                <!-- Notes Tab Content -->
-                <LinearLayout
-                    android:id="@+id/notesContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Personal Notes"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_edit" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/notesTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Really enjoying the story so far. The cyberpunk atmosphere is incredible!"
-                        android:textColor="#8B92A8"
-                        android:textSize="14sp"
-                        android:lineSpacingExtra="4dp"
-                        android:layout_marginTop="12dp" />
-                </LinearLayout>
 
                 <!-- Overview Tab Content -->
                 <LinearLayout
@@ -602,77 +564,48 @@
                                 android:gravity="end" />
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
 
-                <!-- Progress Tab Content -->
-                <LinearLayout
-                    android:id="@+id/progressContent"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <LinearLayout
+                    <!-- Summary Section -->
+                    <TextView
+                        android:id="@+id/summaryLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
+                        android:text="Summary"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Overall Progress"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/progressPercentage"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="67%"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:layout_marginEnd="8dp" />
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_edit" />
-                    </LinearLayout>
-
-                    <ProgressBar
-                        android:id="@+id/progressBar"
-                        style="@android:style/Widget.ProgressBar.Horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:progress="67"
-                        android:progressDrawable="@drawable/progress_bar"
-                        android:layout_marginBottom="12dp" />
-
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/summaryText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
+                        android:text=""
+                        android:textColor="#8B92A8"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:layout_marginBottom="16dp" />
 
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:src="@drawable/ic_clock"
-                            android:layout_marginEnd="8dp" />
+                    <!-- Storyline Section -->
+                    <TextView
+                        android:id="@+id/storylineLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Storyline"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:id="@+id/hoursPlayedText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="24h played total"
-                            android:textColor="#8B92A8"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/storylineText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#8B92A8"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp" />
                 </LinearLayout>
 
                 <!-- Photos Tab Content -->
@@ -681,8 +614,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
+                    <!-- User Screenshots Section -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -713,15 +647,141 @@
                             android:textSize="14sp" />
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/screenshotImage"
+                    <LinearLayout
+                        android:id="@+id/userScreenshotsContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ss_tlou2_1"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:contentDescription="Screenshot" />
+                        android:orientation="vertical"
+                        android:layout_marginBottom="24dp" />
 
+                    <!-- IGDB Screenshots Section -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Game Screenshots"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:id="@+id/igdbScreenshotsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+
+                <!-- Notes Tab Content -->
+                <LinearLayout
+                    android:id="@+id/notesContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Personal Notes"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/editNotesIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_edit" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/notesTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Really enjoying the story so far. The cyberpunk atmosphere is incredible!"
+                        android:textColor="#8B92A8"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:layout_marginTop="12dp" />
+                </LinearLayout>
+
+                <!-- Progress Tab Content -->
+                <LinearLayout
+                    android:id="@+id/progressContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Hours Played"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/editHoursIcon"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_edit" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/hoursPlayedText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="24.0 hours played"
+                        android:textColor="#FFFFFF"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="@android:style/Widget.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:progress="67"
+                        android:progressDrawable="@drawable/progress_bar"
+                        android:layout_marginBottom="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_clock"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Track your gaming journey"
+                            android:textColor="#8B92A8"
+                            android:textSize="14sp" />
+                    </LinearLayout>
                 </LinearLayout>
             </FrameLayout>
 
@@ -734,7 +794,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#1A1A1A"
-        android:paddingTop="0dp"
         android:paddingBottom="0dp"
         app:itemIconSize="22dp"
         app:itemIconTint="@color/bottom_nav_color"

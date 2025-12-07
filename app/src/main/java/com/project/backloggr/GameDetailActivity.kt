@@ -56,7 +56,6 @@ class GameDetailActivity : AppCompatActivity() {
     private lateinit var overviewContent: LinearLayout
 
     // Progress Tab Elements
-    private lateinit var progressPercentage: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var hoursPlayedText: TextView
 
@@ -69,9 +68,12 @@ class GameDetailActivity : AppCompatActivity() {
     private lateinit var genreOverviewText: TextView
     private lateinit var publisherText: TextView
     private lateinit var playtimeText: TextView
+    private lateinit var summaryText: TextView
+    private lateinit var storylineText: TextView
 
     // Photos Tab Elements
-    private lateinit var screenshotImage: ImageView
+    private lateinit var userScreenshotsContainer: LinearLayout
+    private lateinit var igdbScreenshotsContainer: LinearLayout
 
     private var libraryId: Int = -1
     private var currentStatus: String = ""
@@ -102,7 +104,7 @@ class GameDetailActivity : AppCompatActivity() {
         initTabs()
         setupTabListeners()
         setupStatusButtons()
-        showTab("Progress")
+        showTab("Overview")
 
         fetchGameDetails()
     }
@@ -123,7 +125,6 @@ class GameDetailActivity : AppCompatActivity() {
         btnOnHold = findViewById(R.id.btnOnHold)
         btnDropped = findViewById(R.id.btnDropped)
 
-        progressPercentage = findViewById(R.id.progressPercentage)
         progressBar = findViewById(R.id.progressBar)
         hoursPlayedText = findViewById(R.id.hoursPlayedText)
 
@@ -135,7 +136,11 @@ class GameDetailActivity : AppCompatActivity() {
         publisherText = findViewById(R.id.publisherText)
         playtimeText = findViewById(R.id.playtimeText)
 
-        screenshotImage = findViewById(R.id.screenshotImage)
+        userScreenshotsContainer = findViewById(R.id.userScreenshotsContainer)
+        igdbScreenshotsContainer = findViewById(R.id.igdbScreenshotsContainer)
+
+        summaryText = findViewById(R.id.summaryText)
+        storylineText = findViewById(R.id.storylineText)
     }
 
     private fun initBottomNavigation() {
@@ -168,10 +173,10 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun setupTabListeners() {
-        tabProgress.setOnClickListener { showTab("Progress") }
+        tabOverview.setOnClickListener { showTab("Overview") }
         tabPhotos.setOnClickListener { showTab("Photos") }
         tabNotes.setOnClickListener { showTab("Notes") }
-        tabOverview.setOnClickListener { showTab("Overview") }
+        tabProgress.setOnClickListener { showTab("Progress") }
     }
 
     private fun setupStatusButtons() {
@@ -180,6 +185,103 @@ class GameDetailActivity : AppCompatActivity() {
         btnBacklogged.setOnClickListener { updateGameStatus("backlogged") }
         btnOnHold.setOnClickListener { updateGameStatus("on_hold") }
         btnDropped.setOnClickListener { updateGameStatus("dropped") }
+
+        // Setup edit buttons for hours and notes
+        findViewById<ImageView>(R.id.editHoursIcon).setOnClickListener { showEditHoursDialog() }
+        findViewById<ImageView>(R.id.editNotesIcon).setOnClickListener { showEditNotesDialog() }
+    }
+
+    private fun showEditHoursDialog() {
+        val builder = android.app.AlertDialog.Builder(this)
+        val input = android.widget.EditText(this)
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+
+        val currentHours = hoursPlayedText.text.toString().replace(" hours played", "")
+        input.setText(currentHours)
+
+        builder.setTitle("Update Hours Played")
+            .setView(input)
+            .setPositiveButton("Update") { _, _ ->
+                val newHours = input.text.toString()
+                if (newHours.isNotEmpty()) {
+                    updateHoursPlayed(newHours)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showEditNotesDialog() {
+        val builder = android.app.AlertDialog.Builder(this)
+        val input = android.widget.EditText(this)
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
+        input.minLines = 3
+
+        val currentNotes = notesTextView.text.toString()
+        if (currentNotes != "No notes added yet.") {
+            input.setText(currentNotes)
+        }
+
+        builder.setTitle("Update Notes")
+            .setView(input)
+            .setPositiveButton("Update") { _, _ ->
+                val newNotes = input.text.toString()
+                updateNotes(newNotes)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun updateHoursPlayed(hours: String) {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: return
+
+        val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
+        val params = mapOf("hours_played" to hours)
+        val jsonObject = org.json.JSONObject(params)
+
+        val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
+            { response ->
+                hoursPlayedText.text = String.format("%.1f hours played", hours.toFloat())
+                val progress = minOf((hours.toFloat() / 50 * 100).toInt(), 100)
+                progressBar.progress = progress
+            },
+            { error ->
+                Log.e("GameDetailActivity", "Failed to update hours", error)
+            }) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer $token",
+                "Content-Type" to "application/json"
+            )
+            override fun getMethod(): Int = 7 // PATCH
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun updateNotes(notes: String) {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: return
+
+        val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
+        val params = mapOf("notes" to notes)
+        val jsonObject = org.json.JSONObject(params)
+
+        val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
+            { response ->
+                notesTextView.text = if (notes.isEmpty()) "No notes added yet." else notes
+            },
+            { error ->
+                Log.e("GameDetailActivity", "Failed to update notes", error)
+            }) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer $token",
+                "Content-Type" to "application/json"
+            )
+            override fun getMethod(): Int = 7 // PATCH
+        }
+
+        Volley.newRequestQueue(this).add(request)
     }
 
     private fun showTab(tabName: String) {
@@ -198,10 +300,10 @@ class GameDetailActivity : AppCompatActivity() {
 
         // Show selected content and highlight tab
         when (tabName) {
-            "Progress" -> {
-                progressContent.visibility = View.VISIBLE
-                tabProgress.setBackgroundResource(R.drawable.tab_selected)
-                tabProgress.setTextColor(resources.getColor(R.color.primary, null))
+            "Overview" -> {
+                overviewContent.visibility = View.VISIBLE
+                tabOverview.setBackgroundResource(R.drawable.tab_selected)
+                tabOverview.setTextColor(resources.getColor(R.color.primary, null))
             }
             "Photos" -> {
                 photosContent.visibility = View.VISIBLE
@@ -213,10 +315,10 @@ class GameDetailActivity : AppCompatActivity() {
                 tabNotes.setBackgroundResource(R.drawable.tab_selected)
                 tabNotes.setTextColor(resources.getColor(R.color.primary, null))
             }
-            "Overview" -> {
-                overviewContent.visibility = View.VISIBLE
-                tabOverview.setBackgroundResource(R.drawable.tab_selected)
-                tabOverview.setTextColor(resources.getColor(R.color.primary, null))
+            "Progress" -> {
+                progressContent.visibility = View.VISIBLE
+                tabProgress.setBackgroundResource(R.drawable.tab_selected)
+                tabProgress.setTextColor(resources.getColor(R.color.primary, null))
             }
         }
     }
@@ -291,6 +393,10 @@ class GameDetailActivity : AppCompatActivity() {
             }
         }
 
+        summaryText.text = gameDetails.optString("summary", "")
+        storylineText.text = gameDetails.optString("storyline", "")
+
+
         // Set developer and publisher
         val companiesArray = gameDetails.optJSONArray("involved_companies")
         if (companiesArray != null) {
@@ -316,12 +422,11 @@ class GameDetailActivity : AppCompatActivity() {
 
         // Set hours played and progress
         val hoursPlayed = gameData.optString("hours_played", "0.00")
-        hoursPlayedText.text = "${hoursPlayed}h played total"
-
-        // For now, calculate a simple progress percentage based on hours
         val hours = hoursPlayed.toFloatOrNull() ?: 0f
+        hoursPlayedText.text = String.format("%.1f hours played", hours)
+
+        // Calculate progress based on hours (assuming 50 hours for completion)
         val estimatedProgress = minOf((hours / 50 * 100).toInt(), 100)
-        progressPercentage.text = "$estimatedProgress%"
         progressBar.progress = estimatedProgress
 
         // Set notes
@@ -332,16 +437,63 @@ class GameDetailActivity : AppCompatActivity() {
             notesTextView.text = "No notes added yet."
         }
 
-        // Set screenshots
+        // Set user screenshots
+        val userScreenshots = gameData.optJSONArray("user_screenshots")
+        userScreenshotsContainer.removeAllViews()
+        if (userScreenshots != null && userScreenshots.length() > 0) {
+            for (i in 0 until userScreenshots.length()) {
+                val screenshot = userScreenshots.getJSONObject(i)
+                val screenshotUrl = screenshot.optString("url", "")
+                addScreenshotImage(screenshotUrl, userScreenshotsContainer)
+            }
+        } else {
+            addEmptyScreenshotMessage(userScreenshotsContainer, "No personal screenshots yet")
+        }
+
+        // Set IGDB screenshots
+        igdbScreenshotsContainer.removeAllViews()
         val screenshotsArray = gameDetails.optJSONArray("screenshots")
         if (screenshotsArray != null && screenshotsArray.length() > 0) {
-            val firstScreenshot = screenshotsArray.getJSONObject(0)
-            val screenshotUrl = "https:" + firstScreenshot.optString("url", "").replace("t_thumb", "t_screenshot_big")
-            Glide.with(this).load(screenshotUrl).into(screenshotImage)
+            for (i in 0 until minOf(6, screenshotsArray.length())) {
+                val screenshot = screenshotsArray.getJSONObject(i)
+                val screenshotUrl = "https:" + screenshot.optString("url", "").replace("t_thumb", "t_screenshot_big")
+                addScreenshotImage(screenshotUrl, igdbScreenshotsContainer)
+            }
         }
 
         // Placeholder for playtime estimate
         playtimeText.text = "Varies"
+    }
+
+    private fun addScreenshotImage(url: String, container: LinearLayout) {
+        val imageView = ImageView(this)
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.bottomMargin = 16
+        imageView.layoutParams = params
+        imageView.adjustViewBounds = true
+        imageView.scaleType = ImageView.ScaleType.FIT_CENTER
+
+        Glide.with(this).load(url).into(imageView)
+        container.addView(imageView)
+    }
+
+    private fun addEmptyScreenshotMessage(container: LinearLayout, message: String) {
+        val textView = TextView(this)
+        textView.text = message
+        textView.setTextColor(resources.getColor(R.color.unselected, null))
+        textView.textSize = 14f
+        textView.gravity = android.view.Gravity.CENTER
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.topMargin = 32
+        params.bottomMargin = 32
+        textView.layoutParams = params
+        container.addView(textView)
     }
 
     private fun addPlatformTag(platformName: String) {
@@ -408,20 +560,23 @@ class GameDetailActivity : AppCompatActivity() {
         val params = mapOf("status" to newStatus)
         val jsonObject = org.json.JSONObject(params)
 
-        val request = object : JsonObjectRequest(Method.PUT, url, jsonObject,
+        val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
                 currentStatus = newStatus
                 updateStatusUI(newStatus)
-                Toast.makeText(this, "Status updated successfully", Toast.LENGTH_SHORT).show()
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to update status", error)
-                Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show()
             }) {
+
             override fun getHeaders() = hashMapOf(
                 "Authorization" to "Bearer $token",
                 "Content-Type" to "application/json"
             )
+
+            override fun getMethod(): Int {
+                return 7 // PATCH method in Volley
+            }
         }
 
         Volley.newRequestQueue(this).add(request)
