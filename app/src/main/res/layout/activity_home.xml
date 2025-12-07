@@ -17,13 +17,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
             <!-- Header -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -124,7 +123,7 @@
                         android:id="@+id/tvTotalGamesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="47"
+                        android:text="0"
                         android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold"
@@ -153,7 +152,7 @@
                         android:id="@+id/tvBackloggedCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="23"
+                        android:text="0"
                         android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -180,7 +179,7 @@
                         android:id="@+id/tvCompletedCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="15"
+                        android:text="0"
                         android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -207,7 +206,7 @@
                         android:id="@+id/tvPlayingCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="9"
+                        android:text="0"
                         android:textColor="#FFFFFF"
                         android:textSize="22sp"
                         android:textStyle="bold" />
@@ -237,58 +236,15 @@
                 android:layout_marginTop="8dp"
                 android:scrollbars="none">
 
+                <!-- FIXED: Added ID to container for dynamic population -->
                 <LinearLayout
+                    android:id="@+id/continuePlayingContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <!-- Game Card 1 -->
-                    <LinearLayout
-                        android:layout_width="140dp"
-                        android:layout_height="220dp"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/card_bg"
-                        android:orientation="vertical">
+                    <!-- Game cards will be added dynamically here -->
 
-                        <ImageView
-                            android:id="@+id/gameCover"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/stray_cover" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Stray"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Game Card 2 -->
-                    <LinearLayout
-                        android:layout_width="140dp"
-                        android:layout_height="220dp"
-                        android:background="@drawable/card_bg"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/detroit_cover" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:padding="8dp"
-                            android:text="Detroit"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
                 </LinearLayout>
             </HorizontalScrollView>
 
@@ -302,9 +258,9 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-
         </LinearLayout>
     </ScrollView>
+
     <include
         android:id="@+id/bottomNavigation"
         layout="@layout/navbar"

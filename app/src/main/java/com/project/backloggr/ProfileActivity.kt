@@ -26,7 +26,8 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile)
 
         initViews()
-        fetchProfileData()
+        fetchUserData()
+        fetchStatistics()
 
         val settingsIcon = findViewById<ImageView>(R.id.settingsIcon)
         settingsIcon.setOnClickListener {
@@ -54,7 +55,49 @@ class ProfileActivity : AppCompatActivity() {
         btnLogout = findViewById(R.id.btnLogout)
     }
 
-    private fun fetchProfileData() {
+    private fun fetchUserData() {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null)
+
+        if (token == null) {
+            Toast.makeText(this, "Authentication token not found. Please log in again.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val url = "${BuildConfig.BASE_URL}api/auth/me"
+
+        val request = object : JsonObjectRequest(Request.Method.GET, url, null,
+            { response ->
+                try {
+                    val data = response.getJSONObject("data")
+                    val user = data.getJSONObject("user")
+
+                    usernameTextView.text = user.getString("username")
+                    emailTextView.text = user.getString("email")
+
+                    // Note: The API doesn't return createdAt, so we'll set a placeholder
+                    // You may need to add this field to your API response
+                    joinDateTextView.text = "Member since 2024"
+
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Error parsing user data: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            },
+            { error ->
+                Toast.makeText(this, "Failed to fetch user data: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        ) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer $token"
+                return headers
+            }
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun fetchStatistics() {
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null)
 
@@ -69,43 +112,21 @@ class ProfileActivity : AppCompatActivity() {
             { response ->
                 try {
                     val data = response.getJSONObject("data")
-                    val user = data.getJSONObject("user")
                     val statistics = data.getJSONObject("statistics")
-
-                    usernameTextView.text = user.getString("username")
-                    emailTextView.text = user.getString("email")
-
-                    // Format and set the join date
-                    val rawDate = user.getString("createdAt").substring(0, 10) // "YYYY-MM-DD"
-                    val year = rawDate.substring(0, 4)
-                    val month = rawDate.substring(5, 7)
-                    val monthName = when(month) {
-                        "01" -> "January"
-                        "02" -> "February"
-                        "03" -> "March"
-                        "04" -> "April"
-                        "05" -> "May"
-                        "06" -> "June"
-                        "07" -> "July"
-                        "08" -> "August"
-                        "09" -> "September"
-                        "10" -> "October"
-                        "11" -> "November"
-                        "12" -> "December"
-                        else -> ""
-                    }
-                    joinDateTextView.text = "Joined $monthName $year"
 
                     totalGamesTextView.text = statistics.getString("total_games")
                     completedGamesTextView.text = statistics.getString("completed_games")
-                    playtimeTextView.text = "${statistics.getInt("total_hours_played")}h"
+
+                    // Parse total_hours which comes as "10.00"
+                    val totalHours = statistics.getString("total_hours").toDoubleOrNull() ?: 0.0
+                    playtimeTextView.text = "${totalHours.toInt()}h"
 
                 } catch (e: Exception) {
-                    Toast.makeText(this, "Error parsing profile data", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error parsing statistics: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             },
             { error ->
-                Toast.makeText(this, "Failed to fetch profile data: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Failed to fetch statistics: ${error.message}", Toast.LENGTH_LONG).show()
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {

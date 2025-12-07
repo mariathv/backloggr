@@ -90,20 +90,7 @@
                         android:gravity="center_vertical"
                         android:layout_marginTop="6dp">
 
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:src="@drawable/ic_calender"
-                            android:layout_marginEnd="4dp"
-                            app:tint="#AAAAAA" />
 
-                        <TextView
-                            android:id="@+id/joinDate"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Joined January 2024"
-                            android:textColor="#AAAAAA"
-                            android:textSize="13sp" />
                     </LinearLayout>
                 </LinearLayout>
 

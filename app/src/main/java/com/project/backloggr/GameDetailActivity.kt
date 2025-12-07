@@ -18,6 +18,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -76,20 +77,26 @@ class GameDetailActivity : AppCompatActivity() {
     private lateinit var igdbScreenshotsContainer: LinearLayout
 
     private var libraryId: Int = -1
+    private var igdbGameId: Int = -1
     private var currentStatus: String = ""
+    private var isInLibrary: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_game_detail)
 
-        // Get library ID from intent
+        // Get library ID or IGDB game ID from intent
         libraryId = intent.getIntExtra("LIBRARY_ID", -1)
-        if (libraryId == -1) {
+        igdbGameId = intent.getIntExtra("IGDB_GAME_ID", -1)
+
+        if (libraryId == -1 && igdbGameId == -1) {
             Toast.makeText(this, "Invalid game ID", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
+
+        isInLibrary = libraryId != -1
 
         // Adjust padding for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -106,7 +113,11 @@ class GameDetailActivity : AppCompatActivity() {
         setupStatusButtons()
         showTab("Overview")
 
-        fetchGameDetails()
+        if (isInLibrary) {
+            fetchGameDetails()
+        } else {
+            fetchGameDetailsFromIGDB()
+        }
     }
 
     private fun initViews() {
@@ -192,6 +203,11 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun showEditHoursDialog() {
+        if (!isInLibrary) {
+            Toast.makeText(this, "Add game to library first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val builder = android.app.AlertDialog.Builder(this)
         val input = android.widget.EditText(this)
         input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -212,6 +228,11 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun showEditNotesDialog() {
+        if (!isInLibrary) {
+            Toast.makeText(this, "Add game to library first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val builder = android.app.AlertDialog.Builder(this)
         val input = android.widget.EditText(this)
         input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -238,7 +259,7 @@ class GameDetailActivity : AppCompatActivity() {
 
         val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
         val params = mapOf("hours_played" to hours)
-        val jsonObject = org.json.JSONObject(params)
+        val jsonObject = JSONObject(params)
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
@@ -265,7 +286,7 @@ class GameDetailActivity : AppCompatActivity() {
 
         val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
         val params = mapOf("notes" to notes)
-        val jsonObject = org.json.JSONObject(params)
+        val jsonObject = JSONObject(params)
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
@@ -323,6 +344,43 @@ class GameDetailActivity : AppCompatActivity() {
         }
     }
 
+    private fun fetchGameDetailsFromIGDB() {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: run {
+            Toast.makeText(this, "Authentication token not found", Toast.LENGTH_LONG).show()
+            finish()
+            return
+        }
+
+        val url = "${BuildConfig.BASE_URL}api/games/$igdbGameId"
+
+        val request = object : JsonObjectRequest(Method.GET, url, null,
+            { response ->
+                try {
+                    // FIXED: Changed from game_details to game
+                    val gameDetails = response.getJSONObject("data").getJSONObject("game")
+                    populateGameDetailsFromIGDB(gameDetails)
+                } catch (e: Exception) {
+                    Log.e("GameDetailActivity", "Error parsing game details", e)
+                    Log.e("GameDetailActivity", "Response: $response", e) // Added for debugging
+                    Toast.makeText(this, "Error loading game details", Toast.LENGTH_LONG).show()
+                }
+            },
+            { error ->
+                Log.e("GameDetailActivity", "Failed to fetch game details", error)
+                // Log more details about the error
+                error.networkResponse?.let {
+                    Log.e("GameDetailActivity", "Status code: ${it.statusCode}")
+                    Log.e("GameDetailActivity", "Response data: ${String(it.data)}")
+                }
+                Toast.makeText(this, "Failed to load game: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+            }) {
+            override fun getHeaders() = hashMapOf("Authorization" to "Bearer $token")
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
     private fun fetchGameDetails() {
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: run {
@@ -355,7 +413,107 @@ class GameDetailActivity : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
-    private fun populateGameDetails(gameData: org.json.JSONObject, gameDetails: org.json.JSONObject) {
+    private fun populateGameDetailsFromIGDB(gameDetails: JSONObject) {
+        // Set game title
+        gameTitle.text = gameDetails.optString("name", "Unknown Game")
+
+        // Set cover image
+        val coverObj = gameDetails.optJSONObject("cover")
+        if (coverObj != null) {
+            val coverUrl = "https:" + coverObj.optString("url", "").replace("t_thumb", "t_cover_big")
+            Glide.with(this).load(coverUrl).into(gameBanner)
+        }
+
+        // FIXED: Reset all status buttons to inactive state
+        val buttons = listOf(btnCurrentlyPlaying, btnCompleted, btnBacklogged, btnOnHold, btnDropped)
+        buttons.forEach { it.setBackgroundResource(R.drawable.status_button_normal) }
+
+        // Set status badge to "Not in Library"
+        statusBadge.text = "Not in Library"
+        statusBadge.setBackgroundResource(R.drawable.status_badge_background) // If you have a default badge style
+        infoMessage.visibility = View.VISIBLE
+        infoMessageText.text = "Select a status to add this game to your library"
+
+        // Clear current status
+        currentStatus = ""
+
+        // Set genres
+        val genresArray = gameDetails.optJSONArray("genres")
+        if (genresArray != null && genresArray.length() > 0) {
+            val genre = genresArray.getJSONObject(0).optString("name", "Unknown")
+            genreText.text = genre
+            genreOverviewText.text = genre
+        }
+
+        // Set rating
+        val rating = gameDetails.optDouble("rating", 0.0)
+        ratingText.text = String.format("%.1f", rating / 10.0)
+
+        // Set platforms
+        platformsContainer.removeAllViews()
+        val platformsArray = gameDetails.optJSONArray("platforms")
+        if (platformsArray != null) {
+            for (i in 0 until minOf(3, platformsArray.length())) {
+                val platform = platformsArray.getJSONObject(i)
+                val platformName = platform.optString("name", "")
+                addPlatformTag(platformName)
+            }
+        }
+
+        summaryText.text = gameDetails.optString("summary", "No summary available")
+        storylineText.text = gameDetails.optString("storyline", "No storyline available")
+
+        // Set developer and publisher
+        val companiesArray = gameDetails.optJSONArray("involved_companies")
+        if (companiesArray != null) {
+            for (i in 0 until companiesArray.length()) {
+                val company = companiesArray.getJSONObject(i)
+                val companyName = company.getJSONObject("company").optString("name", "")
+                if (company.optBoolean("developer", false)) {
+                    developerText.text = companyName
+                }
+                if (company.optBoolean("publisher", false)) {
+                    publisherText.text = companyName
+                }
+            }
+        }
+
+        // Set release date
+        val releaseTimestamp = gameDetails.optLong("first_release_date", 0)
+        if (releaseTimestamp > 0) {
+            val date = Date(releaseTimestamp * 1000)
+            val format = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+            releaseDateText.text = format.format(date)
+        } else {
+            releaseDateText.text = "Unknown"
+        }
+
+        // Set default values for library-specific data
+        hoursPlayedText.text = "0.0 hours played"
+        progressBar.progress = 0
+        notesTextView.text = "No notes added yet."
+
+        // Set IGDB screenshots
+        igdbScreenshotsContainer.removeAllViews()
+        val screenshotsArray = gameDetails.optJSONArray("screenshots")
+        if (screenshotsArray != null && screenshotsArray.length() > 0) {
+            for (i in 0 until minOf(6, screenshotsArray.length())) {
+                val screenshot = screenshotsArray.getJSONObject(i)
+                val screenshotUrl = "https:" + screenshot.optString("url", "").replace("t_thumb", "t_screenshot_big")
+                addScreenshotImage(screenshotUrl, igdbScreenshotsContainer)
+            }
+        } else {
+            addEmptyScreenshotMessage(igdbScreenshotsContainer, "No screenshots available")
+        }
+
+        // No user screenshots
+        userScreenshotsContainer.removeAllViews()
+        addEmptyScreenshotMessage(userScreenshotsContainer, "No personal screenshots yet")
+
+        playtimeText.text = "Varies"
+    }
+
+    private fun populateGameDetails(gameData: JSONObject, gameDetails: JSONObject) {
         // Set game title
         gameTitle.text = gameDetails.optString("name", "Unknown Game")
 
@@ -395,7 +553,6 @@ class GameDetailActivity : AppCompatActivity() {
 
         summaryText.text = gameDetails.optString("summary", "")
         storylineText.text = gameDetails.optString("storyline", "")
-
 
         // Set developer and publisher
         val companiesArray = gameDetails.optJSONArray("involved_companies")
@@ -461,7 +618,6 @@ class GameDetailActivity : AppCompatActivity() {
             }
         }
 
-        // Placeholder for playtime estimate
         playtimeText.text = "Varies"
     }
 
@@ -550,23 +706,72 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun updateGameStatus(newStatus: String) {
-        if (newStatus == currentStatus) return
+        if (!isInLibrary) {
+            // Add game to library
+            addGameToLibrary(newStatus)
+        } else {
+            // Update existing game status
+            if (newStatus == currentStatus) return
+            updateExistingGameStatus(newStatus)
+        }
+    }
 
+    private fun addGameToLibrary(status: String) {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: return
+
+        val url = "${BuildConfig.BASE_URL}api/library"
+        val params = mapOf(
+            "igdb_game_id" to igdbGameId,
+            "status" to status
+        )
+        val jsonObject = JSONObject(params)
+
+        val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
+            { response ->
+                try {
+                    // Get the library ID from response
+                    val gameData = response.getJSONObject("data").getJSONObject("game")
+                    libraryId = gameData.getInt("id")
+                    isInLibrary = true
+                    currentStatus = status
+                    updateStatusUI(status)
+                    Toast.makeText(this, "Game added to library", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Log.e("GameDetailActivity", "Error parsing response", e)
+                }
+            },
+            { error ->
+                Log.e("GameDetailActivity", "Failed to add game to library", error)
+                Toast.makeText(this, "Failed to add game: ${error.message}", Toast.LENGTH_SHORT).show()
+            }) {
+            override fun getHeaders() = hashMapOf(
+                "Authorization" to "Bearer $token",
+                "Content-Type" to "application/json"
+            )
+        }
+
+        Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun updateExistingGameStatus(newStatus: String) {
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
 
         val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
 
         val params = mapOf("status" to newStatus)
-        val jsonObject = org.json.JSONObject(params)
+        val jsonObject = JSONObject(params)
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
                 currentStatus = newStatus
                 updateStatusUI(newStatus)
+                Toast.makeText(this, "Status updated", Toast.LENGTH_SHORT).show()
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to update status", error)
+                Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show()
             }) {
 
             override fun getHeaders() = hashMapOf(
@@ -581,4 +786,5 @@ class GameDetailActivity : AppCompatActivity() {
 
         Volley.newRequestQueue(this).add(request)
     }
+
 }

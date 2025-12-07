@@ -17,11 +17,12 @@ import org.json.JSONException
 
 class SearchActivity : AppCompatActivity() {
 
-    /*private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var searchInput: EditText
     private lateinit var gamesRecyclerView: RecyclerView
-    //private lateinit var gameAdapter: GameAdapter
-    private val games = mutableListOf<Game>()
+    private lateinit var gameAdapter: GameAdapter
+
+    private val games = mutableListOf<GameMinimal>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,7 @@ class SearchActivity : AppCompatActivity() {
                     startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                 }
-                R.id.nav_explore -> { /* Do nothing */ }
+                R.id.nav_explore -> {}
                 R.id.nav_library -> {
                     startActivity(Intent(this, LibraryActivity::class.java))
                     finish()
@@ -85,25 +86,44 @@ class SearchActivity : AppCompatActivity() {
 
         val url = "${BuildConfig.BASE_URL}api/games/search?q=$query"
 
-        val request = JsonObjectRequest(Request.Method.GET, url, null,
+        val request = JsonObjectRequest(
+            Request.Method.GET,
+            url,
+            null,
             { response ->
                 try {
-                    val newGames = mutableListOf<Game>()
-                    val data = response.getJSONArray("data")
-                    for (i in 0 until data.length()) {
-                        val gameJson = data.getJSONObject(i)
-                        val coverObject = gameJson.optJSONObject("cover")
-                        // Ensure we get a valid URL, replacing thumb with a higher quality image
-                        val coverUrl = coverObject?.getString("url")?.replace("t_thumb", "t_cover_big") ?: ""
-                        val game = Game(
-                            id = gameJson.getInt("id"),
-                            title = gameJson.getString("name"),
-                            coverUrl = coverUrl,
-                            status = ""
-                        )
-                        newGames.add(game)
+                    val newGames = mutableListOf<GameMinimal>()
+                    val dataObject = response.getJSONObject("data")
+                    val gamesArray = dataObject.getJSONArray("games")
+
+                    for (i in 0 until gamesArray.length()) {
+                        val gameContainer = gamesArray.getJSONObject(i)
+                        val gameDetails = gameContainer.getJSONObject("game_details")
+
+                        if (gameDetails != null) {
+                            val coverObj = gameDetails.optJSONObject("cover")
+                            val rawCoverUrl = coverObj?.optString("url")?.replace("t_thumb", "t_cover_big") ?: ""
+
+                            val coverUrl = if (rawCoverUrl.startsWith("//")) {
+                                "https:$rawCoverUrl"
+                            } else {
+                                rawCoverUrl
+                            }
+
+                            if (gameDetails.has("id") && gameDetails.has("name") && coverUrl.isNotEmpty()) {
+                                val game = GameMinimal(
+                                    id = gameDetails.getInt("id"),
+                                    title = gameDetails.getString("name"),
+                                    coverUrl = coverUrl,
+                                    status = "" // Status is not relevant for search results
+                                )
+                                newGames.add(game)
+                            }
+                        }
                     }
+
                     gameAdapter.updateGames(newGames)
+
                 } catch (e: JSONException) {
                     Toast.makeText(this, "Error parsing search results", Toast.LENGTH_SHORT).show()
                 }
@@ -114,5 +134,5 @@ class SearchActivity : AppCompatActivity() {
         )
 
         Volley.newRequestQueue(this).add(request)
-    }*/
+    }
 }
