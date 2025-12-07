@@ -167,7 +167,9 @@ class EditProfileActivity : AppCompatActivity() {
             put("username", username)
             put("email", email)
             put("bio", bio)
-            put("profile_image_url", profileImageBase64 ?: "")
+            if (!profileImageBase64.isNullOrEmpty()) {
+                put("profile_image_url", profileImageBase64)
+            }
         }
 
         val url = "${BuildConfig.BASE_URL}api/auth/profile"

@@ -25,6 +25,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
     private var currentProfile: JSONObject? = null
+    private var isUpdatingDarkMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +54,17 @@ class SettingsActivity : AppCompatActivity() {
         // Back navigation
         backIcon.setOnClickListener { finish() }
 
-        // Live-save switches
+        // Live-save switches with delay for dark mode
         switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit { putBoolean("dark_mode", isChecked) }
-            toggleDarkMode(isChecked)
-            saveSwitchToBackend("dark_mode", isChecked)
+            if (!isUpdatingDarkMode) {
+                prefs.edit { putBoolean("dark_mode", isChecked) }
+
+                // Save to backend first, then toggle theme
+                saveSwitchToBackend("dark_mode", isChecked) {
+                    // Theme will auto-apply on next activity
+                    toggleDarkModeGlobally(isChecked)
+                }
+            }
         }
 
         switchAnalytics.setOnCheckedChangeListener { _, isChecked ->
@@ -79,7 +86,9 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, PrivacynSecurityActivity::class.java))
         }
 
-        aboutSection.setOnClickListener { }
+        aboutSection.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
+        }
     }
 
     private fun loadLocalSettings() {
@@ -87,14 +96,18 @@ class SettingsActivity : AppCompatActivity() {
         val analytics = prefs.getBoolean("analytics_enabled", false)
         val notifications = prefs.getBoolean("notifications_enabled", true)
 
+        isUpdatingDarkMode = true
         switchDarkMode.isChecked = darkMode
         switchAnalytics.isChecked = analytics
         switchNotifications.isChecked = notifications
+        isUpdatingDarkMode = false
 
-        toggleDarkMode(darkMode)
+        // Apply dark mode setting
+        val mode = if (darkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        AppCompatDelegate.setDefaultNightMode(mode)
     }
 
-    private fun toggleDarkMode(enabled: Boolean) {
+    private fun toggleDarkModeGlobally(enabled: Boolean) {
         val mode = if (enabled) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
         AppCompatDelegate.setDefaultNightMode(mode)
     }
@@ -122,9 +135,11 @@ class SettingsActivity : AppCompatActivity() {
                     currentProfile = response.getJSONObject("data").getJSONObject("user")
 
                     // Backend might return 0/1 instead of true/false
+                    isUpdatingDarkMode = true
                     switchDarkMode.isChecked = currentProfile?.optInt("dark_mode", 1) != 0
                     switchAnalytics.isChecked = currentProfile?.optInt("analytics_enabled", 0) != 0
                     switchNotifications.isChecked = currentProfile?.optInt("notifications_enabled", 1) != 0
+                    isUpdatingDarkMode = false
 
                     // Enable switches now
                     setSwitchesEnabled(true)
@@ -152,7 +167,7 @@ class SettingsActivity : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
-    private fun saveSwitchToBackend(field: String, value: Boolean) {
+    private fun saveSwitchToBackend(field: String, value: Boolean, onSuccess: (() -> Unit)? = null) {
         val token = prefs.getString("token", null)
         if (token.isNullOrEmpty()) {
             Toast.makeText(this, "Please login again", Toast.LENGTH_SHORT).show()
@@ -166,22 +181,38 @@ class SettingsActivity : AppCompatActivity() {
             put(field, value)
         }
 
-        setSwitchesEnabled(false)
+        // Only disable switches for non-dark-mode fields
+        if (field != "dark_mode") {
+            setSwitchesEnabled(false)
+        }
 
         val url = "${BuildConfig.BASE_URL}api/auth/settings"
 
         val request = object : JsonObjectRequest(Method.PUT, url, body,
             { response ->
-                setSwitchesEnabled(true)
-                Snackbar.make(switchDarkMode, "$field updated!", Snackbar.LENGTH_SHORT).show()
+                if (field != "dark_mode") {
+                    setSwitchesEnabled(true)
+                }
+
+                runOnUiThread {
+                    Snackbar.make(switchDarkMode, "$field updated!", Snackbar.LENGTH_SHORT).show()
+                }
+
+                // Call success callback if provided
+                onSuccess?.invoke()
             },
             { error ->
-                setSwitchesEnabled(true)
+                if (field != "dark_mode") {
+                    setSwitchesEnabled(true)
+                }
+
                 Log.e("SettingsActivity", "Failed to save $field: " +
                         "${error.networkResponse?.statusCode} " +
                         "${error.networkResponse?.data?.let { String(it) }}")
 
-                Toast.makeText(this, "Failed to update $field", Toast.LENGTH_SHORT).show()
+                runOnUiThread {
+                    Toast.makeText(this, "Failed to update $field", Toast.LENGTH_SHORT).show()
+                }
             }) {
 
             override fun getHeaders(): MutableMap<String, String> {
@@ -194,5 +225,4 @@ class SettingsActivity : AppCompatActivity() {
 
         Volley.newRequestQueue(this).add(request)
     }
-
 }
