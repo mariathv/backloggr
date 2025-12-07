@@ -26,6 +26,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var tvPlayingCount: TextView
     private lateinit var btnAddGame: Button
 
+    private lateinit var db: DatabaseHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -36,7 +38,19 @@ class HomeActivity : AppCompatActivity() {
         fetchPlayingGames()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (NetworkUtils.isOnline(this)) {
+            SyncManager.syncPendingChanges(this) {
+                fetchStatistics()
+                fetchPlayingGames()
+            }
+        }
+    }
+
+
     private fun initViews() {
+        db = DatabaseHelper(this)
         bottomNavigation = findViewById(R.id.bottomNavigation)
         bottomNavigation.selectedItemId = R.id.nav_home
         profileCircle = findViewById(R.id.profileCircle)
@@ -82,6 +96,20 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun fetchStatistics() {
+        // First, load from SQLite for instant display
+        val cachedStats = db.getStatistics()
+        if (cachedStats != null) {
+            updateStatisticsUI(cachedStats)
+        }
+
+        // If online, fetch from server
+        if (!NetworkUtils.isOnline(this)) {
+            if (cachedStats == null) {
+                Toast.makeText(this, "No cached data available. Please connect to internet.", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
         val url = "${BuildConfig.BASE_URL}api/statistics"
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null)
@@ -100,19 +128,13 @@ class HomeActivity : AppCompatActivity() {
             { response ->
                 try {
                     Log.d("HomeActivity", "Statistics Response: $response")
-
-                    // FIXED: Navigate to data.statistics instead of data directly
                     val statistics = response.getJSONObject("data").getJSONObject("statistics")
 
-                    val totalGames = statistics.optInt("total_games", 0)
-                    val backlogged = statistics.optInt("backlogged_games", 0)
-                    val playing = statistics.optInt("playing_games", 0)
-                    val completed = statistics.optInt("completed_games", 0)
+                    // Update SQLite cache
+                    db.updateStatistics(statistics)
 
-                    tvTotalGamesCount.text = totalGames.toString()
-                    tvBackloggedCount.text = backlogged.toString()
-                    tvPlayingCount.text = playing.toString()
-                    tvCompletedCount.text = completed.toString()
+                    // Update UI
+                    updateStatisticsUI(statistics)
                 } catch (e: Exception) {
                     Log.e("HomeActivity", "Error parsing statistics", e)
                     Toast.makeText(this, "Error parsing statistics data", Toast.LENGTH_SHORT).show()
@@ -124,7 +146,9 @@ class HomeActivity : AppCompatActivity() {
                     Log.e("HomeActivity", "Status code: ${it.statusCode}")
                     Log.e("HomeActivity", "Response: ${String(it.data)}")
                 }
-                Toast.makeText(this, "Error fetching statistics: ${error.message}", Toast.LENGTH_LONG).show()
+                if (cachedStats == null) {
+                    Toast.makeText(this, "Error fetching statistics: ${error.message}", Toast.LENGTH_LONG).show()
+                }
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {
@@ -136,8 +160,32 @@ class HomeActivity : AppCompatActivity() {
 
         Volley.newRequestQueue(this).add(request)
     }
+    private fun updateStatisticsUI(statistics: JSONObject) {
+        val totalGames = statistics.optInt("total_games", 0)
+        val backlogged = statistics.optInt("backlogged_games", 0)
+        val playing = statistics.optInt("playing_games", 0)
+        val completed = statistics.optInt("completed_games", 0)
 
+        tvTotalGamesCount.text = totalGames.toString()
+        tvBackloggedCount.text = backlogged.toString()
+        tvPlayingCount.text = playing.toString()
+        tvCompletedCount.text = completed.toString()
+    }
     private fun fetchPlayingGames() {
+        // First, load from SQLite
+        val cachedGames = db.getGamesByStatus("playing")
+        if (cachedGames.isNotEmpty()) {
+            displayPlayingGames(cachedGames)
+        }
+
+        // If online, fetch from server
+        if (!NetworkUtils.isOnline(this)) {
+            if (cachedGames.isEmpty()) {
+                addEmptyPlayingState()
+            }
+            return
+        }
+
         val url = "${BuildConfig.BASE_URL}api/library?status=playing&limit=10&offset=0"
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
@@ -149,26 +197,25 @@ class HomeActivity : AppCompatActivity() {
             { response ->
                 try {
                     Log.d("HomeActivity", "Playing Games Response: $response")
-
-                    // FIXED: Navigate to data.games array
                     val gamesArray = response.getJSONObject("data").getJSONArray("games")
 
-                    // Clear existing views
-                    continuePlayingContainer.removeAllViews()
-
-                    if (gamesArray.length() == 0) {
-                        // Show empty state
-                        addEmptyPlayingState()
-                    } else {
-                        // Add game cards
-                        for (i in 0 until minOf(10, gamesArray.length())) {
-                            val game = gamesArray.getJSONObject(i)
-                            addGameCard(game)
-                        }
+                    // Update SQLite cache
+                    for (i in 0 until gamesArray.length()) {
+                        val game = gamesArray.getJSONObject(i)
+                        db.insertOrUpdateGame(game)
                     }
+
+                    // Convert to list and display
+                    val games = mutableListOf<JSONObject>()
+                    for (i in 0 until gamesArray.length()) {
+                        games.add(gamesArray.getJSONObject(i))
+                    }
+                    displayPlayingGames(games)
                 } catch (e: Exception) {
                     Log.e("HomeActivity", "Error parsing playing games", e)
-                    Toast.makeText(this, "Error loading playing games", Toast.LENGTH_SHORT).show()
+                    if (cachedGames.isEmpty()) {
+                        Toast.makeText(this, "Error loading playing games", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             { error ->
@@ -187,6 +234,17 @@ class HomeActivity : AppCompatActivity() {
         }
 
         Volley.newRequestQueue(this).add(request)
+    }
+    private fun displayPlayingGames(games: List<JSONObject>) {
+        continuePlayingContainer.removeAllViews()
+
+        if (games.isEmpty()) {
+            addEmptyPlayingState()
+        } else {
+            for (i in 0 until minOf(10, games.size)) {
+                addGameCard(games[i])
+            }
+        }
     }
 
     private fun addGameCard(game: JSONObject) {

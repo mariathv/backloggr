@@ -1,5 +1,6 @@
 package com.project.backloggr
 
+import VolleyMultipartRequest
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,7 +25,7 @@ import java.util.Date
 import java.util.Locale
 
 class GameDetailActivity : AppCompatActivity() {
-
+    private lateinit var db: DatabaseHelper
     private lateinit var bottomNavigation: BottomNavigationView
 
     // UI Elements
@@ -76,6 +77,9 @@ class GameDetailActivity : AppCompatActivity() {
     private lateinit var userScreenshotsContainer: LinearLayout
     private lateinit var igdbScreenshotsContainer: LinearLayout
 
+    private lateinit var addPhotoButton: TextView
+    private val PICK_IMAGE_REQUEST = 1
+
     private var libraryId: Int = -1
     private var igdbGameId: Int = -1
     private var currentStatus: String = ""
@@ -119,7 +123,12 @@ class GameDetailActivity : AppCompatActivity() {
             fetchGameDetailsFromIGDB()
         }
     }
-
+    override fun onResume() {
+        super.onResume()
+        if (NetworkUtils.isOnline(this)) {
+            SyncManager.syncPendingChanges(this)
+        }
+    }
     private fun initViews() {
         gameBanner = findViewById(R.id.gameBanner)
         gameTitle = findViewById(R.id.gameTitle)
@@ -152,6 +161,9 @@ class GameDetailActivity : AppCompatActivity() {
 
         summaryText = findViewById(R.id.summaryText)
         storylineText = findViewById(R.id.storylineText)
+
+        addPhotoButton = findViewById(R.id.addPhotoButton)
+        db = DatabaseHelper(this)
     }
 
     private fun initBottomNavigation() {
@@ -188,6 +200,7 @@ class GameDetailActivity : AppCompatActivity() {
         tabPhotos.setOnClickListener { showTab("Photos") }
         tabNotes.setOnClickListener { showTab("Notes") }
         tabProgress.setOnClickListener { showTab("Progress") }
+        addPhotoButton.setOnClickListener { openGallery() }
     }
 
     private fun setupStatusButtons() {
@@ -254,6 +267,26 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun updateHoursPlayed(hours: String) {
+        // Update SQLite immediately
+        db.updateGameField(libraryId, "hours_played", hours)
+
+        // Update UI immediately
+        hoursPlayedText.text = String.format("%.1f hours played", hours.toFloat())
+        val progress = minOf((hours.toFloat() / 50 * 100).toInt(), 100)
+        progressBar.progress = progress
+
+        // Add to pending sync
+        val syncData = JSONObject().apply {
+            put("hours_played", hours)
+        }
+        db.insertPendingSync(libraryId, "UPDATE", syncData)
+
+        // If online, sync immediately
+        if (!NetworkUtils.isOnline(this)) {
+            Toast.makeText(this, "Saved offline. Will sync when online.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
 
@@ -263,12 +296,11 @@ class GameDetailActivity : AppCompatActivity() {
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
-                hoursPlayedText.text = String.format("%.1f hours played", hours.toFloat())
-                val progress = minOf((hours.toFloat() / 50 * 100).toInt(), 100)
-                progressBar.progress = progress
+                // Sync successful, nothing to do (UI already updated)
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to update hours", error)
+                Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
             }) {
             override fun getHeaders() = hashMapOf(
                 "Authorization" to "Bearer $token",
@@ -279,8 +311,25 @@ class GameDetailActivity : AppCompatActivity() {
 
         Volley.newRequestQueue(this).add(request)
     }
-
     private fun updateNotes(notes: String) {
+        // Update SQLite immediately
+        db.updateGameField(libraryId, "notes", notes)
+
+        // Update UI immediately
+        notesTextView.text = if (notes.isEmpty()) "No notes added yet." else notes
+
+        // Add to pending sync
+        val syncData = JSONObject().apply {
+            put("notes", notes)
+        }
+        db.insertPendingSync(libraryId, "UPDATE", syncData)
+
+        // If online, sync immediately
+        if (!NetworkUtils.isOnline(this)) {
+          //  Toast.makeText(this, "Saved offline. Will sync when online.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
 
@@ -290,10 +339,11 @@ class GameDetailActivity : AppCompatActivity() {
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
-                notesTextView.text = if (notes.isEmpty()) "No notes added yet." else notes
+                // Sync successful
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to update notes", error)
+            //    Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
             }) {
             override fun getHeaders() = hashMapOf(
                 "Authorization" to "Bearer $token",
@@ -345,9 +395,24 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun fetchGameDetailsFromIGDB() {
+        // First check cache
+        val cachedGame = db.getGameCache(igdbGameId)
+        if (cachedGame != null) {
+            populateGameDetailsFromIGDB(cachedGame)
+        }
+
+        // If offline, use cache only
+        if (!NetworkUtils.isOnline(this)) {
+            if (cachedGame == null) {
+             //   Toast.makeText(this, "No cached data. Please connect to internet.", Toast.LENGTH_LONG).show()
+                finish()
+            }
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: run {
-            Toast.makeText(this, "Authentication token not found", Toast.LENGTH_LONG).show()
+       //     Toast.makeText(this, "Authentication token not found", Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -357,23 +422,29 @@ class GameDetailActivity : AppCompatActivity() {
         val request = object : JsonObjectRequest(Method.GET, url, null,
             { response ->
                 try {
-                    // FIXED: Changed from game_details to game
                     val gameDetails = response.getJSONObject("data").getJSONObject("game")
+
+                    // Cache the game data
+                    db.insertGameCache(igdbGameId, gameDetails.toString())
+
                     populateGameDetailsFromIGDB(gameDetails)
                 } catch (e: Exception) {
                     Log.e("GameDetailActivity", "Error parsing game details", e)
-                    Log.e("GameDetailActivity", "Response: $response", e) // Added for debugging
-                    Toast.makeText(this, "Error loading game details", Toast.LENGTH_LONG).show()
+                    Log.e("GameDetailActivity", "Response: $response", e)
+                    if (cachedGame == null) {
+                        Toast.makeText(this, "Error loading game details", Toast.LENGTH_LONG).show()
+                    }
                 }
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to fetch game details", error)
-                // Log more details about the error
                 error.networkResponse?.let {
                     Log.e("GameDetailActivity", "Status code: ${it.statusCode}")
                     Log.e("GameDetailActivity", "Response data: ${String(it.data)}")
                 }
-                Toast.makeText(this, "Failed to load game: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                if (cachedGame == null) {
+                    Toast.makeText(this, "Failed to load game: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                }
             }) {
             override fun getHeaders() = hashMapOf("Authorization" to "Bearer $token")
         }
@@ -382,6 +453,22 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun fetchGameDetails() {
+        // First check SQLite
+        val cachedGame = db.getGame(libraryId)
+        if (cachedGame != null) {
+            val gameDetails = cachedGame.getJSONObject("game_details")
+            populateGameDetails(cachedGame, gameDetails)
+        }
+
+        // If offline, use cache only
+        if (!NetworkUtils.isOnline(this)) {
+            if (cachedGame == null) {
+                Toast.makeText(this, "No cached data. Please connect to internet.", Toast.LENGTH_LONG).show()
+                finish()
+            }
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: run {
             Toast.makeText(this, "Authentication token not found", Toast.LENGTH_LONG).show()
@@ -397,15 +484,22 @@ class GameDetailActivity : AppCompatActivity() {
                     val gameData = response.getJSONObject("data").getJSONObject("game")
                     val gameDetails = gameData.getJSONObject("game_details")
 
+                    // Update SQLite cache
+                    db.insertOrUpdateGame(gameData)
+
                     populateGameDetails(gameData, gameDetails)
                 } catch (e: Exception) {
                     Log.e("GameDetailActivity", "Error parsing game details", e)
-                    Toast.makeText(this, "Error loading game details", Toast.LENGTH_LONG).show()
+                    if (cachedGame == null) {
+                        Toast.makeText(this, "Error loading game details", Toast.LENGTH_LONG).show()
+                    }
                 }
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to fetch game details", error)
-                Toast.makeText(this, "Failed to load game: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                if (cachedGame == null) {
+                    Toast.makeText(this, "Failed to load game: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                }
             }) {
             override fun getHeaders() = hashMapOf("Authorization" to "Bearer $token")
         }
@@ -413,23 +507,43 @@ class GameDetailActivity : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
+
     private fun populateGameDetailsFromIGDB(gameDetails: JSONObject) {
         // Set game title
         gameTitle.text = gameDetails.optString("name", "Unknown Game")
 
         // Set cover image
         val coverObj = gameDetails.optJSONObject("cover")
-        if (coverObj != null) {
-            val coverUrl = "https:" + coverObj.optString("url", "").replace("t_thumb", "t_cover_big")
-            Glide.with(this).load(coverUrl).into(gameBanner)
+        val coverUrl = coverObj?.optString("url")?.takeIf { it.isNotEmpty() }?.let {
+            "https:" + it.replace("t_thumb", "t_cover_big")
         }
 
-        // FIXED: Reset all status buttons to inactive state
-        val buttons = listOf(btnCurrentlyPlaying, btnCompleted, btnBacklogged, btnOnHold, btnDropped)
-        buttons.forEach { it.setBackgroundResource(R.drawable.status_button_normal) }
+        if (coverUrl != null) {
+            Glide.with(this)
+                .load(coverUrl)
+                .placeholder(R.drawable.placeholder_game) // optional placeholder
+                .error(R.drawable.placeholder_game)       // fallback if loading fails
+                .into(gameBanner)
+        } else {
+            gameBanner.setImageResource(R.drawable.placeholder_game)
+        }
 
-        // Set status badge to "Not in Library"
-        statusBadge.text = "Not in Library"
+
+// Only reset buttons if game is NOT in library
+        if (!isInLibrary) {
+            val buttons = listOf(btnCurrentlyPlaying, btnCompleted, btnBacklogged, btnOnHold, btnDropped)
+            buttons.forEach { it.setBackgroundResource(R.drawable.status_button_normal) }
+
+            statusBadge.text = "Not in Library"
+            statusBadge.setBackgroundResource(R.drawable.status_badge_background)
+            infoMessage.visibility = View.VISIBLE
+            infoMessageText.text = "Select a status to add this game to your library"
+
+            currentStatus = ""
+        } else {
+            // Game is in library, update UI with current status
+            updateStatusUI(currentStatus)
+        }
         statusBadge.setBackgroundResource(R.drawable.status_badge_background) // If you have a default badge style
         infoMessage.visibility = View.VISIBLE
         infoMessageText.text = "Select a status to add this game to your library"
@@ -519,10 +633,20 @@ class GameDetailActivity : AppCompatActivity() {
 
         // Set cover image
         val coverObj = gameDetails.optJSONObject("cover")
-        if (coverObj != null) {
-            val coverUrl = "https:" + coverObj.optString("url", "").replace("t_thumb", "t_cover_big")
-            Glide.with(this).load(coverUrl).into(gameBanner)
+        val coverUrl = coverObj?.optString("url")?.takeIf { it.isNotEmpty() }?.let {
+            "https:" + it.replace("t_thumb", "t_cover_big")
         }
+
+        if (coverUrl != null) {
+            Glide.with(this)
+                .load(coverUrl)
+                .placeholder(R.drawable.placeholder_game) // optional placeholder
+                .error(R.drawable.placeholder_game)       // fallback if loading fails
+                .into(gameBanner)
+        } else {
+            gameBanner.setImageResource(R.drawable.placeholder_game)
+        }
+
 
         // Set status
         currentStatus = gameData.optString("status", "backlogged")
@@ -717,6 +841,49 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun addGameToLibrary(status: String) {
+        // Create temporary local library ID
+        val tempLibraryId = -(System.currentTimeMillis().toInt()) // Negative ID for temp
+
+        // Create game data for SQLite
+        val gameData = JSONObject().apply {
+            put("id", tempLibraryId)
+            put("igdb_game_id", igdbGameId)
+            put("status", status)
+            put("hours_played", "0.00")
+            put("notes", "")
+
+            // Get cached game details
+            val cachedGame = db.getGameCache(igdbGameId)
+            if (cachedGame != null) {
+                put("game_details", cachedGame)
+            } else {
+                put("game_details", JSONObject())
+            }
+        }
+
+        // Insert into SQLite immediately
+        db.insertOrUpdateGame(gameData)
+        libraryId = tempLibraryId
+        isInLibrary = true
+        currentStatus = status
+        updateStatusUI(status)
+
+        // Add to pending sync
+        val syncData = JSONObject().apply {
+            put("igdb_game_id", igdbGameId)
+            put("status", status)
+            put("local_library_id", tempLibraryId)
+        }
+        db.insertPendingSync(tempLibraryId, "ADD", syncData)
+
+      //  Toast.makeText(this, "Game added to library", Toast.LENGTH_SHORT).show()
+
+        // If online, sync immediately
+        if (!NetworkUtils.isOnline(this)) {
+       //     Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
 
@@ -730,20 +897,22 @@ class GameDetailActivity : AppCompatActivity() {
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
                 try {
-                    // Get the library ID from response
-                    val gameData = response.getJSONObject("data").getJSONObject("game")
-                    libraryId = gameData.getInt("id")
-                    isInLibrary = true
-                    currentStatus = status
-                    updateStatusUI(status)
-                    Toast.makeText(this, "Game added to library", Toast.LENGTH_SHORT).show()
+                    val serverGameData = response.getJSONObject("data").getJSONObject("game")
+                    val serverLibraryId = serverGameData.getInt("id")
+
+                    // Update SQLite with real server ID
+                    db.updateGameField(tempLibraryId, "id", serverLibraryId)
+                    libraryId = serverLibraryId
+
+                    // Update the game data completely
+                    db.insertOrUpdateGame(serverGameData)
                 } catch (e: Exception) {
                     Log.e("GameDetailActivity", "Error parsing response", e)
                 }
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to add game to library", error)
-                Toast.makeText(this, "Failed to add game: ${error.message}", Toast.LENGTH_SHORT).show()
+        //        Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
             }) {
             override fun getHeaders() = hashMapOf(
                 "Authorization" to "Bearer $token",
@@ -755,36 +924,115 @@ class GameDetailActivity : AppCompatActivity() {
     }
 
     private fun updateExistingGameStatus(newStatus: String) {
+        // Update SQLite immediately
+        db.updateGameField(libraryId, "status", newStatus)
+
+        // Update UI immediately
+        currentStatus = newStatus
+        updateStatusUI(newStatus)
+        Toast.makeText(this, "Status updated", Toast.LENGTH_SHORT).show()
+
+        // Add to pending sync
+        val syncData = JSONObject().apply {
+            put("status", newStatus)
+        }
+        db.insertPendingSync(libraryId, "UPDATE", syncData)
+
+        // If online, sync immediately
+        if (!NetworkUtils.isOnline(this)) {
+            Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
 
         val url = "${BuildConfig.BASE_URL}api/library/$libraryId"
-
         val params = mapOf("status" to newStatus)
         val jsonObject = JSONObject(params)
 
         val request = object : JsonObjectRequest(Method.POST, url, jsonObject,
             { response ->
-                currentStatus = newStatus
-                updateStatusUI(newStatus)
-                Toast.makeText(this, "Status updated", Toast.LENGTH_SHORT).show()
+                // Sync successful
             },
             { error ->
                 Log.e("GameDetailActivity", "Failed to update status", error)
-                Toast.makeText(this, "Failed to update status", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Will sync when online", Toast.LENGTH_SHORT).show()
             }) {
-
             override fun getHeaders() = hashMapOf(
                 "Authorization" to "Bearer $token",
                 "Content-Type" to "application/json"
             )
-
-            override fun getMethod(): Int {
-                return 7 // PATCH method in Volley
-            }
+            override fun getMethod(): Int = 7 // PATCH
         }
 
         Volley.newRequestQueue(this).add(request)
     }
+
+    private fun openGallery() {
+        if (!isInLibrary) {
+            Toast.makeText(this, "Add game to library first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            val imageUri = data.data
+            imageUri?.let { uploadScreenshot(it) }
+        }
+    }
+
+    private fun uploadScreenshot(imageUri: android.net.Uri) {
+        val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+        val token = prefs.getString("token", null) ?: run {
+            Toast.makeText(this, "Authentication token not found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val url = "${BuildConfig.BASE_URL}api/library/$libraryId/screenshots"
+
+        val multipartRequest = object : VolleyMultipartRequest(
+            Method.POST, url,
+            { response ->
+                Toast.makeText(this, "Screenshot uploaded successfully", Toast.LENGTH_SHORT).show()
+                fetchGameDetails() // Refresh UI after upload
+            },
+            { error ->
+                Log.e("GameDetailActivity", "Failed to upload screenshot", error)
+                Toast.makeText(this, "Failed to upload screenshot", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getHeaders(): Map<String, String> {
+                return mapOf(
+                    "Authorization" to "Bearer $token"
+                )
+            }
+
+            override fun getByteData(): Map<String, DataPart> {
+                val params = HashMap<String, DataPart>()
+                try {
+                    contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                        val imageBytes = inputStream.readBytes()
+                        val fileName = "screenshot_${System.currentTimeMillis()}.jpg"
+                        params["screenshot"] = DataPart(fileName, imageBytes, "image/jpeg")
+                    }
+                } catch (e: Exception) {
+                    Log.e("GameDetailActivity", "Error reading image", e)
+                }
+                return params
+            }
+        }
+
+        // Add request to Volley queue
+        Volley.newRequestQueue(this).add(multipartRequest)
+    }
+
 
 }

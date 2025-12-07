@@ -51,7 +51,6 @@ class ProfileActivity : AppCompatActivity() {
         totalGamesTextView = findViewById(R.id.totalGames)
         completedGamesTextView = findViewById(R.id.completedGames)
         playtimeTextView = findViewById(R.id.playTime)
-        joinDateTextView = findViewById(R.id.joinDate)
         btnLogout = findViewById(R.id.btnLogout)
     }
 

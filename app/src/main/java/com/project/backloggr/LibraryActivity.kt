@@ -21,9 +21,10 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import org.json.JSONArray
+import org.json.JSONObject
 
 class LibraryActivity : AppCompatActivity() {
-
+    private lateinit var db: DatabaseHelper
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var gamesRecyclerView: RecyclerView
     private lateinit var libraryAdapter: LibraryAdapter
@@ -61,7 +62,18 @@ class LibraryActivity : AppCompatActivity() {
         fetchLibrary()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (NetworkUtils.isOnline(this)) {
+            SyncManager.syncPendingChanges(this) {
+                fetchCategoryCounts()
+                fetchLibrary()
+            }
+        }
+    }
+
     private fun initViews() {
+        db = DatabaseHelper(this)
         bottomNavigation = findViewById(R.id.bottomNavigation)
         gamesRecyclerView = findViewById(R.id.gamesRecyclerView)
         searchBar = findViewById(R.id.searchBar)
@@ -151,6 +163,23 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun fetchCategoryCounts() {
+        // First load from SQLite
+        val cachedStats = db.getStatistics()
+        if (cachedStats != null) {
+            categoryCounts = mapOf(
+                "all" to cachedStats.optInt("total_games", 0),
+                "playing" to cachedStats.optInt("playing_games", 0),
+                "completed" to cachedStats.optInt("completed_games", 0),
+                "backlogged" to cachedStats.optInt("backlogged_games", 0)
+            )
+            updateChipLabels()
+        }
+
+        // If offline, return
+        if (!NetworkUtils.isOnline(this)) {
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: return
         val url = "${BuildConfig.BASE_URL}api/statistics"
@@ -159,6 +188,10 @@ class LibraryActivity : AppCompatActivity() {
             { response ->
                 try {
                     val stats = response.getJSONObject("data").getJSONObject("statistics")
+
+                    // Update SQLite
+                    db.updateStatistics(stats)
+
                     categoryCounts = mapOf(
                         "all" to stats.optInt("total_games", 0),
                         "playing" to stats.optInt("playing_games", 0),
@@ -183,6 +216,34 @@ class LibraryActivity : AppCompatActivity() {
     }
 
     private fun fetchLibrary() {
+        // First, load from SQLite
+        val cachedGames = if (currentSearch.isNotEmpty()) {
+            db.searchGames(currentSearch, currentStatus)
+        } else if (currentStatus != null) {
+            db.getGamesByStatus(currentStatus!!)
+        } else {
+            db.getAllGames()
+        }
+
+        if (cachedGames.isNotEmpty()) {
+            displayLibraryGames(cachedGames)
+        }
+
+        // If offline, show cached data only
+        if (!NetworkUtils.isOnline(this)) {
+            if (cachedGames.isEmpty()) {
+                val msg = when {
+                    currentSearch.isNotEmpty() -> "No games found matching \"$currentSearch\""
+                    currentStatus != null -> "No games in this category"
+                    else -> "Your library is empty. Please connect to internet to sync."
+                }
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+                libraryAdapter.updateGames(emptyList())
+                tvGamesCount.text = "0 games found"
+            }
+            return
+        }
+
         val prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
         val token = prefs.getString("token", null) ?: run {
             Toast.makeText(this, "Authentication token not found", Toast.LENGTH_LONG).show()
@@ -198,31 +259,25 @@ class LibraryActivity : AppCompatActivity() {
             { response ->
                 try {
                     val gamesArray = response.getJSONObject("data").getJSONArray("games")
-                    val newGames = mutableListOf<Game>()
 
+                    // Update SQLite cache
                     for (i in 0 until gamesArray.length()) {
-                        val gameJson = gamesArray.getJSONObject(i)
-                        val details = gameJson.optJSONObject("game_details")
-                        val title = details?.optString("name") ?: "Game #${gameJson.optInt("igdb_game_id", 0)}"
-                        val libraryId = gameJson.getInt("id")
-                        val igdbGameId = gameJson.getInt("igdb_game_id")
-
-                        var coverUrl = ""
-                        details?.optJSONObject("cover")?.let {
-                            val urlPath = it.optString("url", "")
-                            if (urlPath.isNotEmpty()) coverUrl = "https:" + urlPath.replace("t_thumb", "t_cover_big")
-                        }
-
-                        newGames.add(Game(libraryId, igdbGameId, title, coverUrl, gameJson.optString("status")))
+                        val game = gamesArray.getJSONObject(i)
+                        db.insertOrUpdateGame(game)
                     }
 
-                    Log.d("LibraryActivity", "Parsed ${newGames.size} games, updating adapter")
-                    libraryAdapter.updateGames(newGames)
+                    // Convert to list
+                    val games = mutableListOf<JSONObject>()
+                    for (i in 0 until gamesArray.length()) {
+                        games.add(gamesArray.getJSONObject(i))
+                    }
 
-                    val totalGames = response.getJSONObject("data").optInt("total", newGames.size)
+                    displayLibraryGames(games)
+
+                    val totalGames = response.getJSONObject("data").optInt("total", games.size)
                     tvGamesCount.text = if (totalGames == 1) "1 game found" else "$totalGames games found"
 
-                    if (newGames.isEmpty()) {
+                    if (games.isEmpty()) {
                         val msg = when {
                             currentSearch.isNotEmpty() -> "No games found matching \"$currentSearch\""
                             currentStatus != null -> "No games in this category"
@@ -232,16 +287,42 @@ class LibraryActivity : AppCompatActivity() {
                     }
                 } catch (e: Exception) {
                     Log.e("LibraryActivity", "Error parsing library data", e)
-                    Toast.makeText(this, "Error parsing library data: ${e.message}", Toast.LENGTH_LONG).show()
+                    if (cachedGames.isEmpty()) {
+                        Toast.makeText(this, "Error parsing library data: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
                 }
             },
             { error ->
                 Log.e("LibraryActivity", "Failed to fetch library", error)
-                Toast.makeText(this, "Failed to fetch library: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                if (cachedGames.isEmpty()) {
+                    Toast.makeText(this, "Failed to fetch library: ${error.message ?: "Unknown error"}", Toast.LENGTH_LONG).show()
+                }
             }) {
             override fun getHeaders() = hashMapOf("Authorization" to "Bearer $token")
         }
 
         Volley.newRequestQueue(this).add(request)
+    }
+    private fun displayLibraryGames(games: List<JSONObject>) {
+        val gamesList = mutableListOf<Game>()
+
+        for (gameJson in games) {
+            val details = gameJson.optJSONObject("game_details")
+            val title = details?.optString("name") ?: "Game #${gameJson.optInt("igdb_game_id", 0)}"
+            val libraryId = gameJson.getInt("id")
+            val igdbGameId = gameJson.getInt("igdb_game_id")
+
+            var coverUrl = ""
+            details?.optJSONObject("cover")?.let {
+                val urlPath = it.optString("url", "")
+                if (urlPath.isNotEmpty()) coverUrl = "https:" + urlPath.replace("t_thumb", "t_cover_big")
+            }
+
+            gamesList.add(Game(libraryId, igdbGameId, title, coverUrl, gameJson.optString("status")))
+        }
+
+        Log.d("LibraryActivity", "Displaying ${gamesList.size} games")
+        libraryAdapter.updateGames(gamesList)
+        tvGamesCount.text = if (gamesList.size == 1) "1 game found" else "${gamesList.size} games found"
     }
 }
